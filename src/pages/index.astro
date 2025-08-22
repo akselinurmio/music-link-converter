@@ -1,0 +1,217 @@
+---
+import Layout from "../layouts/Layout.astro";
+import ContentContainer from "../components/ContentContainer.astro";
+import UrlForm from "../components/UrlForm.astro";
+import DropZone from "../components/DropZone.astro";
+import Footer from "../components/Footer.astro";
+import Logo from "../assets/logo.svg";
+import SpotifyLogo from "../assets/spotify.svg";
+import TidalLogo from "../assets/tidal.svg";
+import CheckIcon from "../assets/check.svg";
+---
+
+<Layout canonicalPath="/">
+  <DropZone>
+    <main class="fade-in">
+      <ContentContainer>
+        <div class="hero-content">
+          <div class="hero-icon">
+            <Logo width="64" height="64" />
+          </div>
+
+          <h1>Bridge the Gap Between Spotify and Tidal</h1>
+
+          <p class="hero-description">
+            Transform any track, album, or artist URL from one platform to
+            another instantly. Free, fast, and open source.
+          </p>
+
+          <div class="features">
+            <div class="feature">
+              <CheckIcon width="24" height="24" />
+              <span>Instant conversion</span>
+            </div>
+            <div class="feature">
+              <CheckIcon width="24" height="24" />
+              <span>No registration required</span>
+            </div>
+            <div class="feature">
+              <CheckIcon width="24" height="24" />
+              <span>100% free to use</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <UrlForm
+            action="/convert"
+            placeholder="Paste your Spotify or Tidal link here..."
+            buttonText="Convert Link"
+          />
+
+          <p class="form-hint">Or drag and drop a link anywhere on this page</p>
+        </div>
+
+        <div class="examples">
+          <h3>Supported platforms</h3>
+          <div class="platforms">
+            <a href="/spotify-to-tidal" class="platform">
+              <div class="platform-icon spotify">
+                <SpotifyLogo width="32" height="32" />
+              </div>
+              <span>Spotify to Tidal</span>
+            </a>
+            <a href="/tidal-to-spotify" class="platform">
+              <div class="platform-icon tidal">
+                <TidalLogo width="32" height="32" />
+              </div>
+              <span>Tidal to Spotify</span>
+            </a>
+          </div>
+        </div>
+      </ContentContainer>
+    </main>
+    <Footer />
+  </DropZone>
+</Layout>
+
+<style>
+  .hero-content {
+    text-align: center;
+    margin-bottom: var(--space-3xl);
+  }
+
+  .hero-icon {
+    margin-bottom: var(--space-lg);
+  }
+
+  .hero-description {
+    font-size: 1.25rem;
+    max-width: 600px;
+    margin: 0 auto var(--space-2xl) auto;
+    color: var(--text-secondary);
+  }
+
+  .features {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-xl);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-2xl);
+  }
+
+  .feature {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .feature svg {
+    color: var(--accent-success);
+  }
+
+  .form-section {
+    margin-bottom: var(--space-3xl);
+  }
+
+  .form-hint {
+    margin-top: var(--space-md);
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+
+  .platforms {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-lg);
+    flex-wrap: wrap;
+  }
+
+  .platform {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .platform-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-md);
+  }
+
+  .platform-icon.spotify {
+    background: #1db954;
+    color: white;
+  }
+
+  .platform-icon.tidal {
+    background: #000000;
+    color: white;
+  }
+
+  .platform {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    text-decoration: none;
+    color: inherit;
+    transition:
+      transform var(--transition-normal),
+      border-color var(--transition-normal),
+      background-color var(--transition-normal);
+    padding: var(--space-md);
+    border-radius: var(--radius-lg);
+    border: 1px solid transparent;
+  }
+
+  .platform:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-primary);
+    background: var(--bg-card);
+  }
+
+  .platform span {
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  .platform-arrow {
+    color: var(--accent-primary);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .features {
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .platforms {
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .platform-arrow {
+      transform: rotate(90deg);
+    }
+  }
+</style>

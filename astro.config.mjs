@@ -1,0 +1,17 @@
+// @ts-check
+import { defineConfig } from "astro/config";
+
+import cloudflare from "@astrojs/cloudflare";
+
+// https://astro.build/config
+export default defineConfig({
+  adapter: cloudflare({
+    platformProxy: {
+      enabled: true,
+    },
+
+    imageService: "cloudflare",
+  }),
+  trailingSlash: "never",
+  site: "https://musiclinkconverter.com",
+});

@@ -1,0 +1,246 @@
+---
+import AlbumIcon from "../assets/album.svg";
+import ArrowRightIcon from "../assets/arrow-right.svg";
+import CheckIcon from "../assets/check.svg";
+import Logo from "../assets/logo.svg";
+import MusicIcon from "../assets/music.svg";
+import ShieldIcon from "../assets/shield.svg";
+import SpotifyLogo from "../assets/spotify.svg";
+import StarIcon from "../assets/star.svg";
+import TidalLogo from "../assets/tidal.svg";
+import UserIcon from "../assets/user.svg";
+import ContentContainer from "../components/ContentContainer.astro";
+import DropZone from "../components/DropZone.astro";
+import Footer from "../components/Footer.astro";
+import UrlForm from "../components/UrlForm.astro";
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout
+  title="Convert Spotify links to Tidal"
+  metaDescription="Convert any Spotify track, album, or artist URL to Tidal URL. Free and fast."
+  canonicalPath="/spotify-to-tidal"
+>
+  <DropZone>
+    <main class="fade-in">
+      <ContentContainer>
+        <div class="hero-content">
+          <div class="hero-icon">
+            <Logo width="64" height="64" />
+          </div>
+
+          <div class="platform-header">
+            <div class="platform-icon spotify">
+              <SpotifyLogo width="48" height="48" />
+            </div>
+            <div class="arrow">
+              <ArrowRightIcon width="32" height="32" />
+            </div>
+            <div class="platform-icon tidal">
+              <TidalLogo width="48" height="48" />
+            </div>
+          </div>
+
+          <h1>Convert Spotify links to Tidal instantly</h1>
+
+          <p class="hero-description">
+            Transform Spotify tracks and artists into Tidal links instantly.
+            Experience high-fidelity audio without missing your network’s
+            recommendations.
+          </p>
+
+          <div class="benefits">
+            <div class="benefit">
+              <StarIcon width="24" height="24" />
+              <span>High-fidelity audio quality</span>
+            </div>
+            <div class="benefit">
+              <CheckIcon width="24" height="24" />
+              <span>Instant conversion</span>
+            </div>
+            <div class="benefit">
+              <ShieldIcon width="24" height="24" />
+              <span>Secure & private</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <UrlForm
+            action="/spotify-to-tidal/convert"
+            placeholder="Paste your Spotify link here..."
+            buttonText="Convert to Tidal"
+          />
+
+          <p class="form-hint">
+            Or drag and drop a Spotify link anywhere on this page
+          </p>
+        </div>
+
+        <div class="examples">
+          <h3>Supported Spotify Content</h3>
+          <div class="content-types">
+            <div class="content-type">
+              <MusicIcon width="32" height="32" />
+              <span>Tracks</span>
+            </div>
+            <div class="content-type">
+              <AlbumIcon width="32" height="32" />
+              <span>Albums</span>
+            </div>
+            <div class="content-type">
+              <UserIcon width="32" height="32" />
+              <span>Artists</span>
+            </div>
+          </div>
+        </div>
+      </ContentContainer>
+    </main>
+    <Footer />
+  </DropZone>
+</Layout>
+
+<style>
+  .hero-content {
+    text-align: center;
+    margin-bottom: var(--space-3xl);
+  }
+
+  .hero-icon {
+    margin-bottom: var(--space-lg);
+    color: var(--text-primary);
+  }
+
+  .platform-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+  }
+
+  .platform-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .platform-icon.spotify {
+    background: #1db954;
+    color: white;
+  }
+
+  .platform-icon.tidal {
+    background: #000000;
+    color: white;
+  }
+
+  .arrow {
+    color: var(--accent-primary);
+    animation: pulse 2s infinite;
+  }
+
+  .hero-description {
+    font-size: 1.25rem;
+    max-width: 600px;
+    margin: 0 auto var(--space-2xl) auto;
+    color: var(--text-secondary);
+  }
+
+  .benefits {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-xl);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-2xl);
+  }
+
+  .benefit {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .benefit svg {
+    color: var(--accent-success);
+  }
+
+  .form-section {
+    margin-bottom: var(--space-3xl);
+  }
+
+  .form-hint {
+    text-align: center;
+    margin-top: var(--space-md);
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+
+  .examples {
+    text-align: center;
+  }
+
+  .examples h3 {
+    margin-bottom: var(--space-lg);
+    color: var(--text-primary);
+  }
+
+  .content-types {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-xl);
+    flex-wrap: wrap;
+  }
+
+  .content-type {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--text-secondary);
+  }
+
+  .content-type svg {
+    color: var(--accent-primary);
+  }
+
+  .content-type span {
+    font-weight: 500;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .platform-header {
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .arrow {
+      transform: rotate(90deg);
+    }
+
+    .benefits {
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .content-types {
+      gap: var(--space-lg);
+    }
+  }
+</style>

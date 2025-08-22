@@ -1,0 +1,140 @@
+---
+import ArrowRightIcon from "../assets/arrow-right.svg";
+import { URL_INPUT_ID } from "../constants";
+
+interface Props {
+  action: string;
+  placeholder?: string;
+  buttonText?: string;
+}
+
+const {
+  action,
+  placeholder = "Paste your music link here...",
+  buttonText = "Convert",
+} = Astro.props;
+---
+
+<form class="url-form" action={action} method="POST">
+  <div class="form-group">
+    <input
+      type="url"
+      id={URL_INPUT_ID}
+      name="url"
+      class="url-input"
+      placeholder=" "
+      required
+      autocomplete="off"
+      autofocus
+    />
+    <label for={URL_INPUT_ID} class="floating-label">
+      {placeholder}
+    </label>
+  </div>
+  <button type="submit" class="submit-btn">
+    <span class="btn-text">{buttonText}</span>
+    <ArrowRightIcon class="btn-icon" width="20" height="20" />
+  </button>
+</form>
+
+<style>
+  .url-form {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .form-group {
+    position: relative;
+    margin-bottom: var(--space-lg);
+  }
+
+  .floating-label {
+    position: absolute;
+    left: var(--space-lg);
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--bg-card);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    font-size: 1rem;
+    font-weight: 400;
+    transition:
+      top var(--transition-normal),
+      font-size var(--transition-normal),
+      font-weight var(--transition-normal),
+      color var(--transition-normal),
+      padding var(--transition-normal);
+    pointer-events: none;
+  }
+
+  .url-input {
+    position: relative;
+    width: 100%;
+    padding: var(--space-lg);
+    background: var(--bg-card);
+    border: 2px solid var(--border-primary);
+    border-radius: var(--radius-xl);
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    font-weight: 400;
+    transition:
+      border-color var(--transition-normal),
+      box-shadow var(--transition-normal);
+    box-shadow: var(--shadow-md);
+  }
+
+  .url-input:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+  }
+
+  .url-input:focus + .floating-label,
+  .url-input:not(:placeholder-shown) + .floating-label {
+    top: 0;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0 4px;
+  }
+
+  .url-input:focus + .floating-label {
+    color: var(--accent-primary);
+  }
+
+  .submit-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: var(--space-lg);
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: var(--radius-xl);
+    color: white;
+    font-size: 1.125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      transform var(--transition-normal),
+      box-shadow var(--transition-normal);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .submit-btn:active {
+    transform: translateY(0);
+  }
+
+  .btn-icon {
+    transition: transform var(--transition-fast);
+  }
+
+  .submit-btn:hover .btn-icon {
+    transform: translateX(4px);
+  }
+</style>

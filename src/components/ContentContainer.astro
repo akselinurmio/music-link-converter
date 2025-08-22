@@ -1,0 +1,53 @@
+<div class="content-container">
+  <slot />
+</div>
+
+<style>
+  .content-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--space-2xl);
+    background: var(--bg-card);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-xl);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .content-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--gradient-primary);
+    opacity: 0.5;
+  }
+
+  .content-container::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+      circle at 50% 0%,
+      rgba(99, 102, 241, 0.1) 0%,
+      transparent 50%
+    );
+    pointer-events: none;
+  }
+
+  @media (max-width: 768px) {
+    .content-container {
+      margin: var(--space-lg);
+      padding: var(--space-xl);
+      border-radius: var(--radius-xl);
+    }
+  }
+</style>

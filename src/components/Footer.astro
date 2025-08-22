@@ -1,0 +1,77 @@
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-section">
+      <p class="disclaimer">
+        This tool is not affiliated with Spotify or Tidal. All trademarks belong
+        to their respective owners.
+      </p>
+    </div>
+    <div class="footer-section">
+      <p class="github-link">
+        <a
+          href="https://github.com/akselinurmio/music-link-converter"
+          target="_blank"
+          rel="noopener"
+        >
+          View on GitHub
+        </a>
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background-color: var(--bg-primary);
+    margin-top: auto;
+    padding: var(--space-xl) 0 var(--space-xl) 0;
+    border-top: 1px solid var(--border-primary);
+  }
+
+  .footer-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-lg);
+  }
+
+  .footer-section {
+    flex: 1;
+  }
+
+  .disclaimer {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  .github-link {
+    text-align: right;
+  }
+
+  .github-link a {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .github-link a:hover {
+    color: var(--text-secondary);
+  }
+
+  @media (max-width: 768px) {
+    .footer-content {
+      flex-direction: column;
+      text-align: center;
+      gap: var(--space-md);
+    }
+
+    .github-link {
+      text-align: center;
+    }
+  }
+</style>

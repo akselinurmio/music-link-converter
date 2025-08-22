@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 177 177" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;">
+    <rect id="Artboard1" x="0" y="0" width="177" height="177" style="fill:none;"/>
+    <clipPath id="_clip1">
+        <rect x="0" y="0" width="177" height="177"/>
+    </clipPath>
+    <g clip-path="url(#_clip1)">
+        <g>
+            <circle cx="88" cy="96.5" r="62" style="fill:none;stroke:currentColor;stroke-width:8px;"/>
+            <path d="M69.5,78.5C79.717,78.5 88,86.783 88,97C88,107.217 79.717,115.5 69.5,115.5L54.5,115.5C44.283,115.5 36,107.217 36,97C36,86.783 44.283,78.5 54.5,78.5L69.5,78.5ZM53.785,88.093C48.899,88.093 44.878,92.114 44.878,97C44.878,101.886 48.899,105.907 53.785,105.907L70.215,105.907C75.101,105.907 79.122,101.886 79.122,97C79.122,92.114 75.101,88.093 70.215,88.093L53.785,88.093ZM121.5,78.5C131.717,78.5 140,86.783 140,97C140,107.217 131.717,115.5 121.5,115.5L106.5,115.5C96.283,115.5 88,107.217 88,97C88,86.783 96.283,78.5 106.5,78.5L121.5,78.5ZM105.785,88.093C100.899,88.093 96.878,92.114 96.878,97C96.878,101.886 100.899,105.907 105.785,105.907L122.215,105.907C127.101,105.907 131.122,101.886 131.122,97C131.122,92.114 127.101,88.093 122.215,88.093L105.785,88.093Z" style="fill:currentColor;fill-rule:nonzero;"/>
+            <path d="M62,96.5C62,93.757 64.257,91.5 67,91.5L109,91.5C111.743,91.5 114,93.757 114,96.5C114,99.243 111.743,101.5 109,101.5L67,101.5C64.257,101.5 62,99.243 62,96.5Z" style="fill:currentColor;fill-rule:nonzero;"/>
+            <path d="M41.5,55.5C78.014,70.467 98.486,70.561 135,55.5M41.5,136.761C78.014,121.793 98.486,121.699 135,136.761" style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:7px;"/>
+            <path d="M60,129.5C60,129.5 68.5,158.5 88,158.5C107.5,158.5 116,129 116,129M60,63.008C60,63.008 68.5,34.5 88,34.5C107.5,34.5 116,63.5 116,63.5M88,34.5L88,67M88,125.5L88,158" style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:7px;"/>
+            <path d="M17,75.5L19,75.5C22.292,75.5 25,78.208 25,81.5L25,115.5C25,118.791 22.292,121.5 19,121.5L17,121.5C10.373,121.5 5,116.127 5,109.5L5,87.5C5,80.873 10.373,75.5 17,75.5ZM160,75.5L158,75.5C154.708,75.5 152,78.208 152,81.5L152,115.5C152,118.791 154.708,121.5 158,121.5L160,121.5C166.627,121.5 172,116.127 172,109.5L172,87.5C172,80.873 166.627,75.5 160,75.5Z" style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:8px;stroke-linejoin:round;"/>
+            <path d="M12.709,75.689C21.848,42.036 52.628,18.5 87.5,18.5C123.03,18.5 154.228,42.934 162.742,77.429" style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:8px;"/>
+        </g>
+    </g>
+</svg>
