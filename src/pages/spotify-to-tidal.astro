@@ -1,4 +1,6 @@
 ---
+export const prerender = true;
+
 import AlbumIcon from "../assets/album.svg";
 import ArrowRightIcon from "../assets/arrow-right.svg";
 import CheckIcon from "../assets/check.svg";
@@ -10,7 +12,6 @@ import StarIcon from "../assets/star.svg";
 import TidalLogo from "../assets/tidal.svg";
 import UserIcon from "../assets/user.svg";
 import ContentContainer from "../components/ContentContainer.astro";
-import DropZone from "../components/DropZone.astro";
 import Footer from "../components/Footer.astro";
 import UrlForm from "../components/UrlForm.astro";
 import Layout from "../layouts/Layout.astro";
@@ -21,83 +22,76 @@ import Layout from "../layouts/Layout.astro";
   metaDescription="Convert any Spotify track, album, or artist URL to Tidal URL. Free and fast."
   canonicalPath="/spotify-to-tidal"
 >
-  <DropZone>
-    <main class="fade-in">
-      <ContentContainer>
-        <div class="hero-content">
-          <div class="hero-icon">
-            <Logo width="64" height="64" />
+  <main class="fade-in">
+    <ContentContainer>
+      <div class="hero-content">
+        <div class="hero-icon">
+          <Logo width="64" height="64" />
+        </div>
+
+        <div class="platform-header">
+          <div class="platform-icon spotify">
+            <SpotifyLogo width="48" height="48" />
           </div>
-
-          <div class="platform-header">
-            <div class="platform-icon spotify">
-              <SpotifyLogo width="48" height="48" />
-            </div>
-            <div class="arrow">
-              <ArrowRightIcon width="32" height="32" />
-            </div>
-            <div class="platform-icon tidal">
-              <TidalLogo width="48" height="48" />
-            </div>
+          <div class="arrow">
+            <ArrowRightIcon width="32" height="32" />
           </div>
-
-          <h1>Convert Spotify links to Tidal instantly</h1>
-
-          <p class="hero-description">
-            Transform Spotify tracks and artists into Tidal links instantly.
-            Experience high-fidelity audio without missing your network’s
-            recommendations.
-          </p>
-
-          <div class="benefits">
-            <div class="benefit">
-              <StarIcon width="24" height="24" />
-              <span>High-fidelity audio quality</span>
-            </div>
-            <div class="benefit">
-              <CheckIcon width="24" height="24" />
-              <span>Instant conversion</span>
-            </div>
-            <div class="benefit">
-              <ShieldIcon width="24" height="24" />
-              <span>Secure & private</span>
-            </div>
+          <div class="platform-icon tidal">
+            <TidalLogo width="48" height="48" />
           </div>
         </div>
 
-        <div class="form-section">
-          <UrlForm
-            action="/spotify-to-tidal/convert"
-            placeholder="Paste your Spotify link here..."
-            buttonText="Convert to Tidal"
-          />
+        <h1>Convert Spotify links to Tidal instantly</h1>
 
-          <p class="form-hint">
-            Or drag and drop a Spotify link anywhere on this page
-          </p>
-        </div>
+        <p class="hero-description">
+          Transform Spotify tracks and artists into Tidal links instantly.
+          Experience high-fidelity audio without missing your network's
+          recommendations.
+        </p>
 
-        <div class="examples">
-          <h3>Supported Spotify Content</h3>
-          <div class="content-types">
-            <div class="content-type">
-              <MusicIcon width="32" height="32" />
-              <span>Tracks</span>
-            </div>
-            <div class="content-type">
-              <AlbumIcon width="32" height="32" />
-              <span>Albums</span>
-            </div>
-            <div class="content-type">
-              <UserIcon width="32" height="32" />
-              <span>Artists</span>
-            </div>
+        <div class="benefits">
+          <div class="benefit">
+            <StarIcon width="24" height="24" />
+            <span>High-fidelity audio quality</span>
+          </div>
+          <div class="benefit">
+            <CheckIcon width="24" height="24" />
+            <span>Instant conversion</span>
+          </div>
+          <div class="benefit">
+            <ShieldIcon width="24" height="24" />
+            <span>Secure & private</span>
           </div>
         </div>
-      </ContentContainer>
-    </main>
-    <Footer />
-  </DropZone>
+      </div>
+
+      <div class="form-section">
+        <UrlForm
+          placeholder="Paste your Spotify link here..."
+          buttonText="Convert to Tidal"
+        />
+      </div>
+
+      <div class="examples">
+        <h3>Supported Spotify Content</h3>
+        <div class="content-types">
+          <div class="content-type">
+            <MusicIcon width="32" height="32" />
+            <span>Tracks</span>
+          </div>
+          <div class="content-type">
+            <AlbumIcon width="32" height="32" />
+            <span>Albums</span>
+          </div>
+          <div class="content-type">
+            <UserIcon width="32" height="32" />
+            <span>Artists</span>
+          </div>
+        </div>
+      </div>
+    </ContentContainer>
+  </main>
+  <Footer />
 </Layout>
 
 <style>
@@ -130,7 +124,7 @@ import Layout from "../layouts/Layout.astro";
   }
 
   .platform-icon.spotify {
-    background: #1db954;
+    background: #1ed760;
     color: white;
   }
 
@@ -173,13 +167,6 @@ import Layout from "../layouts/Layout.astro";
 
   .form-section {
     margin-bottom: var(--space-3xl);
-  }
-
-  .form-hint {
-    text-align: center;
-    margin-top: var(--space-md);
-    color: var(--text-muted);
-    font-size: 0.875rem;
   }
 
   .examples {

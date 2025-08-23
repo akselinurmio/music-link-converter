@@ -1,8 +1,9 @@
 ---
+export const prerender = true;
+
 import Layout from "../layouts/Layout.astro";
 import ContentContainer from "../components/ContentContainer.astro";
 import UrlForm from "../components/UrlForm.astro";
-import DropZone from "../components/DropZone.astro";
 import Footer from "../components/Footer.astro";
 import Logo from "../assets/logo.svg";
 import SpotifyLogo from "../assets/spotify.svg";
@@ -11,68 +12,63 @@ import CheckIcon from "../assets/check.svg";
 ---
 
 <Layout canonicalPath="/">
-  <DropZone>
-    <main class="fade-in">
-      <ContentContainer>
-        <div class="hero-content">
-          <div class="hero-icon">
-            <Logo width="64" height="64" />
-          </div>
-
-          <h1>Bridge the Gap Between Spotify and Tidal</h1>
-
-          <p class="hero-description">
-            Transform any track, album, or artist URL from one platform to
-            another instantly. Free, fast, and open source.
-          </p>
-
-          <div class="features">
-            <div class="feature">
-              <CheckIcon width="24" height="24" />
-              <span>Instant conversion</span>
-            </div>
-            <div class="feature">
-              <CheckIcon width="24" height="24" />
-              <span>No registration required</span>
-            </div>
-            <div class="feature">
-              <CheckIcon width="24" height="24" />
-              <span>100% free to use</span>
-            </div>
-          </div>
+  <main class="fade-in">
+    <ContentContainer>
+      <div class="hero-content">
+        <div class="hero-icon">
+          <Logo width="64" height="64" />
         </div>
 
-        <div class="form-section">
-          <UrlForm
-            action="/convert"
-            placeholder="Paste your Spotify or Tidal link here..."
-            buttonText="Convert Link"
-          />
+        <h1>Bridge the Gap Between Spotify and Tidal</h1>
 
-          <p class="form-hint">Or drag and drop a link anywhere on this page</p>
-        </div>
+        <p class="hero-description">
+          Transform any track, album, or artist URL from one platform to another
+          instantly. Free, fast, and open source.
+        </p>
 
-        <div class="examples">
-          <h3>Supported platforms</h3>
-          <div class="platforms">
-            <a href="/spotify-to-tidal" class="platform">
-              <div class="platform-icon spotify">
-                <SpotifyLogo width="32" height="32" />
-              </div>
-              <span>Spotify to Tidal</span>
-            </a>
-            <a href="/tidal-to-spotify" class="platform">
-              <div class="platform-icon tidal">
-                <TidalLogo width="32" height="32" />
-              </div>
-              <span>Tidal to Spotify</span>
-            </a>
+        <div class="features">
+          <div class="feature">
+            <CheckIcon width="24" height="24" />
+            <span>Instant conversion</span>
+          </div>
+          <div class="feature">
+            <CheckIcon width="24" height="24" />
+            <span>No registration required</span>
+          </div>
+          <div class="feature">
+            <CheckIcon width="24" height="24" />
+            <span>100% free to use</span>
           </div>
         </div>
-      </ContentContainer>
-    </main>
-    <Footer />
-  </DropZone>
+      </div>
+
+      <div class="form-section">
+        <UrlForm
+          placeholder="Paste your Spotify or Tidal link here..."
+          buttonText="Convert Link"
+        />
+      </div>
+
+      <div class="examples">
+        <h3>Supported platforms</h3>
+        <div class="platforms">
+          <a href="/spotify-to-tidal" class="platform">
+            <div class="platform-icon spotify">
+              <SpotifyLogo width="32" height="32" />
+            </div>
+            <span>Spotify to Tidal</span>
+          </a>
+          <a href="/tidal-to-spotify" class="platform">
+            <div class="platform-icon tidal">
+              <TidalLogo width="32" height="32" />
+            </div>
+            <span>Tidal to Spotify</span>
+          </a>
+        </div>
+      </div>
+    </ContentContainer>
+  </main>
+  <Footer />
 </Layout>
 
 <style>
@@ -116,12 +112,6 @@ import CheckIcon from "../assets/check.svg";
     margin-bottom: var(--space-3xl);
   }
 
-  .form-hint {
-    margin-top: var(--space-md);
-    color: var(--text-muted);
-    font-size: 0.875rem;
-  }
-
   .platforms {
     display: flex;
     align-items: center;
@@ -148,7 +138,7 @@ import CheckIcon from "../assets/check.svg";
   }
 
   .platform-icon.spotify {
-    background: #1db954;
+    background: #1ed760;
     color: white;
   }
 

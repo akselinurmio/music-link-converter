@@ -12,6 +12,7 @@
 	},
 	"dependencies": {
 		"@astrojs/cloudflare": "^12.6.4",
+		"@badgateway/oauth2-client": "^3.3.0",
 		"astro": "^5.13.2"
 	},
 	"devDependencies": {

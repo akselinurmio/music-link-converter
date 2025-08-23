@@ -1,0 +1,91 @@
+---
+export const prerender = false;
+
+import ContentContainer from "../components/ContentContainer.astro";
+import Layout from "../layouts/Layout.astro";
+import type { MusicEntityType } from "../music-types";
+import {
+  assertTidalEntityId,
+  getTidalEntity,
+  tidalShareUrlTypeToEntityType,
+} from "../services/tidal";
+
+let error: string | null = null;
+
+interface ParsedUrl {
+  service: "spotify" | "tidal";
+  type: MusicEntityType;
+  id: string;
+}
+
+async function getUrlData(): Promise<ParsedUrl> {
+  const urlParameter = Astro.url.searchParams.get("url");
+
+  if (!urlParameter) {
+    throw new Error("No URL provided");
+  }
+
+  const { protocol, hostname, pathname } = new URL(urlParameter);
+
+  if (protocol === "spotify:") {
+    const [type, id] = pathname.split(":");
+    return { service: "spotify", type, id };
+  } else if (protocol === "tidal:") {
+    const type = tidalShareUrlTypeToEntityType(hostname);
+    const id = pathname.slice(1);
+    assertTidalEntityId(id);
+    return { service: "tidal", type, id };
+  } else if (protocol === "https:" || protocol === "http:") {
+    if (hostname === "open.spotify.com") {
+      const pathParts = pathname.split("/");
+      const type = pathParts[1];
+      const id = pathParts[2];
+      return { service: "spotify", type, id };
+    } else if (hostname === "tidal.com") {
+      const pathParts = pathname.split("/");
+      const type = tidalShareUrlTypeToEntityType(pathParts[2]);
+      const id = pathParts[3];
+      assertTidalEntityId(id);
+      return { service: "tidal", type, id };
+    }
+  }
+
+  throw new Error("Unsupported URL");
+}
+
+const country = Astro.request.cf?.country as string | undefined;
+const fromUrl = await getUrlData();
+
+const fromEntity =
+  fromUrl.service === "tidal"
+    ? await getTidalEntity(fromUrl.type, fromUrl.id, country)
+    : null;
+---
+
+<Layout title="Convert Spotify and Tidal links">
+  <main>
+    {
+      fromEntity && (
+        <ContentContainer>
+          <div>
+            {fromUrl.service} {fromEntity.type}
+          </div>
+          <div>{fromEntity.name}</div>
+          <div>{fromEntity.url}</div>
+          <div>{fromEntity.type === "album" && fromEntity.releaseDate}</div>
+          <div>
+            {(fromEntity.type === "album" || fromEntity.type === "song") &&
+              fromEntity.artists.join(", ")}
+          </div>
+          <div>
+            {fromEntity.type === "album" &&
+              fromEntity.images.map((image) => image.url).join(", ")}
+          </div>
+          <div>{fromEntity.type === "song" && fromEntity.duration}</div>
+          <div>{fromEntity.type === "song" && fromEntity.isrc}</div>
+        </ContentContainer>
+      )
+    }
+    {error && <div>{error}</div>}
+  </main>
+</Layout>

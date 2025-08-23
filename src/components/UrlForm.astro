@@ -1,25 +1,22 @@
 ---
 import ArrowRightIcon from "../assets/arrow-right.svg";
-import { URL_INPUT_ID } from "../constants";
 
 interface Props {
-  action: string;
   placeholder?: string;
   buttonText?: string;
 }
 
 const {
-  action,
   placeholder = "Paste your music link here...",
   buttonText = "Convert",
 } = Astro.props;
 ---
 
-<form class="url-form" action={action} method="POST">
+<form class="url-form" action="/convert">
   <div class="form-group">
     <input
       type="url"
-      id={URL_INPUT_ID}
+      id="url-input"
       name="url"
       class="url-input"
       placeholder=" "
@@ -27,7 +24,7 @@ const {
       autocomplete="off"
       autofocus
     />
-    <label for={URL_INPUT_ID} class="floating-label">
+    <label for="url-input" class="floating-label">
       {placeholder}
     </label>
   </div>
@@ -59,12 +56,12 @@ const {
     color: var(--text-secondary);
     font-size: 1rem;
     font-weight: 400;
+    padding: 0 4px;
     transition:
       top var(--transition-normal),
       font-size var(--transition-normal),
       font-weight var(--transition-normal),
-      color var(--transition-normal),
-      padding var(--transition-normal);
+      color var(--transition-normal);
     pointer-events: none;
   }
 
@@ -76,7 +73,7 @@ const {
     border: 2px solid var(--border-primary);
     border-radius: var(--radius-xl);
     color: var(--text-primary);
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 400;
     transition:
       border-color var(--transition-normal),
@@ -94,7 +91,6 @@ const {
     top: 0;
     font-size: 0.75rem;
     font-weight: 500;
-    padding: 0 4px;
   }
 
   .url-input:focus + .floating-label {
