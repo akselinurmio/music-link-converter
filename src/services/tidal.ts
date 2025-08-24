@@ -7,75 +7,9 @@ import type {
   MusicEntityType,
   Song,
 } from "../music-types";
-
-type TidalEntityType = "tracks" | "albums" | "artists";
-
-const TidalArtistSchema = z.object({
-  id: z.string(),
-  type: z.literal("artists"),
-  attributes: z.object({
-    name: z.string(),
-  }),
-});
-
-const TidalArtistResponseSchema = z.object({
-  data: TidalArtistSchema,
-});
-
-const TidalTrackSchema = z.object({
-  id: z.string(),
-  type: z.literal("tracks"),
-  attributes: z.object({
-    title: z.string(),
-    isrc: z.string(),
-    duration: z.string(),
-  }),
-});
-
-const TidalTrackResponseSchema = z.object({
-  data: TidalTrackSchema,
-  included: z.array(TidalArtistSchema),
-});
-
-const TidalAlbumSchema = z.object({
-  id: z.string(),
-  type: z.literal("albums"),
-  attributes: z.object({
-    title: z.string(),
-    releaseDate: z.string().date(),
-  }),
-});
-
-const TidalCoverArtSchema = z.object({
-  id: z.string(),
-  type: z.literal("artworks"),
-  attributes: z.object({
-    mediaType: z.literal("IMAGE"),
-    files: z.array(
-      z.object({
-        href: z.string().url(),
-        meta: z.object({
-          width: z.number(),
-          height: z.number(),
-        }),
-      }),
-    ),
-  }),
-});
-
-const TidalAlbumResponseSchema = z.object({
-  data: TidalAlbumSchema,
-  included: z.array(z.union([TidalArtistSchema, TidalCoverArtSchema])),
-});
-
-const TidalSearchResponseSchema = z.object({
-  data: z.array(
-    z.object({
-      id: z.string(),
-      type: z.enum(["tracks", "albums", "artists"]),
-    }),
-  ),
-});
+import { APIError } from "../utils/errors";
+import { Temporal } from "@js-temporal/polyfill";
+import { formatDuration } from "../utils/duration";
 
 class TidalClient {
   private client: OAuth2Client;
@@ -104,9 +38,136 @@ class TidalClient {
 
 const client = new TidalClient();
 
+async function tidalFetch<T extends z.Schema>(
+  path: string,
+  schema: T,
+): Promise<z.infer<T>> {
+  const response = await fetch(`https://openapi.tidal.com/v2${path}`, {
+    headers: {
+      Authorization: `Bearer ${await client.getAccessToken()}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new APIError(
+      `Tidal API request failed with status: ${response.status}`,
+      response.status,
+    );
+  }
+
+  const rawData = await response.json();
+  return schema.parse(rawData);
+}
+
+type TidalEntityType = "tracks" | "albums" | "artists";
+
+const TidalArtworkSchema = z.object({
+  id: z.string(),
+  type: z.literal("artworks"),
+  attributes: z.object({
+    mediaType: z.literal("IMAGE"),
+    files: z.array(
+      z.object({
+        href: z.string().url(),
+        meta: z.object({
+          width: z.number(),
+          height: z.number(),
+        }),
+      }),
+    ),
+  }),
+});
+
+const TidalArtworkResponseSchema = z.object({
+  included: z.array(TidalArtworkSchema),
+});
+
+const TidalArtistSchema = z.object({
+  id: z.string(),
+  type: z.literal("artists"),
+  attributes: z.object({
+    name: z.string(),
+  }),
+});
+
+const TidalArtistResponseSchema = z.object({
+  data: TidalArtistSchema,
+  included: z.array(TidalArtworkSchema),
+});
+
+const TidalAlbumSchema = z.object({
+  id: z.string(),
+  type: z.literal("albums"),
+  attributes: z.object({
+    title: z.string(),
+    releaseDate: z.string(),
+  }),
+  relationships: z.object({
+    artists: z.object({
+      data: z.array(
+        z.object({
+          id: z.string(),
+          type: z.literal("artists"),
+        }),
+      ),
+    }),
+  }),
+});
+
+const SimpleAlbumSchema = TidalAlbumSchema.omit({
+  relationships: true,
+});
+
+const TidalAlbumResponseSchema = z.object({
+  data: TidalAlbumSchema,
+  included: z.array(z.union([TidalArtistSchema, TidalArtworkSchema])),
+});
+
+const TidalTrackSchema = z.object({
+  id: z.string(),
+  type: z.literal("tracks"),
+  attributes: z.object({
+    title: z.string(),
+    isrc: z.string(),
+    duration: z.string(),
+  }),
+  relationships: z.object({
+    artists: z.object({
+      data: z.array(
+        z.object({
+          id: z.string(),
+          type: z.literal("artists"),
+        }),
+      ),
+    }),
+    albums: z.object({
+      data: z.array(
+        z.object({
+          id: z.string(),
+          type: z.literal("albums"),
+        }),
+      ),
+    }),
+  }),
+});
+
+const TidalTrackResponseSchema = z.object({
+  data: TidalTrackSchema,
+  included: z.array(z.union([TidalArtistSchema, SimpleAlbumSchema])),
+});
+
+const TidalSearchResponseSchema = z.object({
+  data: z.array(
+    z.object({
+      id: z.string(),
+      type: z.enum(["tracks", "albums", "artists"]),
+    }),
+  ),
+});
+
 async function getAlbum(id: string, countryCode: string): Promise<Album> {
   const { data, included } = await tidalFetch(
-    `/albums/${encodeURIComponent(id)}?countryCode=${encodeURIComponent(countryCode)}&include=artists,coverArt`,
+    `/albums/${encodeURIComponent(id)}?countryCode=${countryCode}&include=artists,coverArt`,
     TidalAlbumResponseSchema,
   );
 
@@ -128,42 +189,86 @@ async function getAlbum(id: string, countryCode: string): Promise<Album> {
     type: "album",
     name: data.attributes.title,
     releaseDate: data.attributes.releaseDate,
-    url: generateTidalUrl("albums", id),
-    artists,
+    url: `https://tidal.com/browse/album/${id}`,
+    artists: artists.map((artist) => ({
+      name: artist,
+      url: `https://tidal.com/browse/artist/${artist}`,
+    })),
     images,
   };
 }
 
 async function getArtist(id: string, countryCode: string): Promise<Artist> {
-  const { data } = await tidalFetch(
-    `/artists/${encodeURIComponent(id)}?countryCode=${encodeURIComponent(countryCode)}`,
+  const { data, included } = await tidalFetch(
+    `/artists/${encodeURIComponent(id)}?countryCode=${countryCode}&include=profileArt`,
     TidalArtistResponseSchema,
+  );
+
+  const images = included.flatMap((item) =>
+    item.attributes.files.map((file) => ({
+      url: file.href,
+      width: file.meta.width,
+      height: file.meta.height,
+    })),
   );
 
   return {
     type: "artist",
     name: data.attributes.name,
-    url: generateTidalUrl("artists", id),
+    url: `https://tidal.com/browse/artist/${id}`,
+    images,
   };
 }
 
 async function getSong(id: string, countryCode: string): Promise<Song> {
   const { data, included } = await tidalFetch(
-    `/tracks/${encodeURIComponent(id)}?countryCode=${encodeURIComponent(countryCode)}&include=artists`,
+    `/tracks/${encodeURIComponent(id)}?countryCode=${countryCode}&include=albums,artists`,
     TidalTrackResponseSchema,
   );
 
-  const artists = included
+  const durationSeconds = Temporal.Duration.from(
+    data.attributes.duration,
+  ).total("seconds");
+
+  const albumId = data.relationships.albums.data[0].id;
+
+  const { included: albumArtwork } = await tidalFetch(
+    `/albums/${encodeURIComponent(albumId)}/relationships/coverArt?countryCode=${countryCode}&include=coverArt`,
+    TidalArtworkResponseSchema,
+  );
+
+  const albumTitle = included.find((item) => item.type === "albums")!.attributes
+    .title!;
+
+  const artists = data.relationships.artists.data
+    .map((item) => included.find((artist) => artist.id === item.id)!)
     .filter((item) => item.type === "artists")
-    .map((item) => item.attributes.name);
+    .map((artist) => ({
+      name: artist.attributes.name,
+      url: `https://tidal.com/browse/artist/${artist.id}`,
+    }));
+
+  const images = albumArtwork.flatMap((item) =>
+    item.attributes.files.map((file) => ({
+      url: file.href,
+      width: file.meta.width,
+      height: file.meta.height,
+    })),
+  );
 
   return {
     type: "song",
     name: data.attributes.title,
-    url: generateTidalUrl("tracks", id),
-    duration: data.attributes.duration,
+    url: `https://tidal.com/browse/track/${id}`,
+    durationSeconds,
+    durationFormatted: formatDuration(durationSeconds),
     isrc: data.attributes.isrc,
     artists,
+    album: {
+      name: albumTitle,
+      url: `https://tidal.com/browse/album/${albumId}`,
+    },
+    images,
   };
 }
 
@@ -191,30 +296,12 @@ export async function searchTidalEntity(
   const normalizedQuery = normalizeQuery(query);
 
   const { data: searchResults } = await tidalFetch(
-    `/searchResults/${encodeURIComponent(normalizedQuery)}/relationships/${tidalType}?countryCode=${encodeURIComponent(countryCode)}`,
+    `/searchResults/${encodeURIComponent(normalizedQuery)}/relationships/${tidalType}?countryCode=${countryCode}`,
     TidalSearchResponseSchema,
   );
   const [firstResult] = searchResults;
 
   return firstResult ? getTidalEntity(type, firstResult.id, countryCode) : null;
-}
-
-async function tidalFetch<T extends z.Schema>(
-  path: string,
-  schema: T,
-): Promise<z.infer<T>> {
-  const response = await fetch(`https://openapi.tidal.com/v2${path}`, {
-    headers: {
-      Authorization: `Bearer ${await client.getAccessToken()}`,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`Tidal API request failed with status: ${response.status}`);
-  }
-
-  const rawData = await response.json();
-  return schema.parse(rawData);
 }
 
 function mapEntityTypeToTidalType(type: MusicEntityType): TidalEntityType {
@@ -234,11 +321,6 @@ function normalizeQuery(input: string) {
     .replace(/\p{C}+/gu, " ")
     .replace(/\s+/g, " ")
     .trim();
-}
-
-function generateTidalUrl(type: TidalEntityType, id: string): string {
-  const singularType = type.slice(0, -1); // Remove 's' from plural types
-  return `https://tidal.com/browse/${singularType}/${id}`;
 }
 
 export function tidalShareUrlTypeToEntityType(type: string): MusicEntityType {

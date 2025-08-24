@@ -1,16 +1,20 @@
 ---
 export const prerender = false;
 
+import Logo from "../assets/logo.svg";
 import ContentContainer from "../components/ContentContainer.astro";
+import Footer from "../components/Footer.astro";
+import MusicCard from "../components/MusicCard.astro";
 import Layout from "../layouts/Layout.astro";
-import type { MusicEntityType } from "../music-types";
+import type { MusicEntity, MusicEntityType } from "../music-types";
+import { getSpotifyEntity, searchSpotifyEntity } from "../services/spotify";
 import {
   assertTidalEntityId,
   getTidalEntity,
+  searchTidalEntity,
   tidalShareUrlTypeToEntityType,
 } from "../services/tidal";
-
-let error: string | null = null;
+import { getStatusCodeFromError, ValidationError } from "../utils/errors";
 
 interface ParsedUrl {
   service: "spotify" | "tidal";
@@ -19,73 +23,237 @@ interface ParsedUrl {
 }
 
 async function getUrlData(): Promise<ParsedUrl> {
-  const urlParameter = Astro.url.searchParams.get("url");
+  try {
+    const urlParameter = Astro.url.searchParams.get("url");
 
-  if (!urlParameter) {
-    throw new Error("No URL provided");
-  }
+    if (!urlParameter) {
+      throw new ValidationError("No URL provided");
+    }
 
-  const { protocol, hostname, pathname } = new URL(urlParameter);
+    const { protocol, hostname, pathname } = new URL(urlParameter);
 
-  if (protocol === "spotify:") {
-    const [type, id] = pathname.split(":");
-    return { service: "spotify", type, id };
-  } else if (protocol === "tidal:") {
-    const type = tidalShareUrlTypeToEntityType(hostname);
-    const id = pathname.slice(1);
-    assertTidalEntityId(id);
-    return { service: "tidal", type, id };
-  } else if (protocol === "https:" || protocol === "http:") {
-    if (hostname === "open.spotify.com") {
-      const pathParts = pathname.split("/");
-      const type = pathParts[1];
-      const id = pathParts[2];
-      return { service: "spotify", type, id };
-    } else if (hostname === "tidal.com") {
-      const pathParts = pathname.split("/");
-      const type = tidalShareUrlTypeToEntityType(pathParts[2]);
-      const id = pathParts[3];
+    if (protocol === "spotify:") {
+      const [type, id] = pathname.split(":");
+      return { service: "spotify", type: type as MusicEntityType, id };
+    } else if (protocol === "tidal:") {
+      const type = tidalShareUrlTypeToEntityType(hostname);
+      const id = pathname.slice(1);
       assertTidalEntityId(id);
       return { service: "tidal", type, id };
+    } else if (protocol === "https:" || protocol === "http:") {
+      if (hostname === "open.spotify.com") {
+        const pathParts = pathname.split("/");
+        const type = pathParts[1] as MusicEntityType;
+        const id = pathParts[2];
+        return { service: "spotify", type, id };
+      } else if (hostname === "tidal.com") {
+        const pathParts = pathname.split("/");
+        const type = tidalShareUrlTypeToEntityType(pathParts[2]);
+        const id = pathParts[3];
+        assertTidalEntityId(id);
+        return { service: "tidal", type, id };
+      }
     }
-  }
 
-  throw new Error("Unsupported URL");
+    throw new ValidationError("Unsupported URL format");
+  } catch (err) {
+    if (err instanceof ValidationError) {
+      throw err;
+    }
+
+    throw new ValidationError("Invalid URL format");
+  }
 }
 
 const country = Astro.request.cf?.country as string | undefined;
-const fromUrl = await getUrlData();
 
-const fromEntity =
-  fromUrl.service === "tidal"
-    ? await getTidalEntity(fromUrl.type, fromUrl.id, country)
-    : null;
+let fromUrl: ParsedUrl | null = null;
+let fromService: "spotify" | "tidal" | null = null;
+let toService: "spotify" | "tidal" | null = null;
+let fromEntity: MusicEntity | null = null;
+let toEntity: MusicEntity | null = null;
+let error: Error | null = null;
+
+try {
+  fromUrl = await getUrlData();
+  fromService = fromUrl.service;
+  toService = fromService === "spotify" ? "tidal" : "spotify";
+
+  fromEntity =
+    fromUrl.service === "tidal"
+      ? await getTidalEntity(fromUrl.type, fromUrl.id, country)
+      : await getSpotifyEntity(fromUrl.type, fromUrl.id, country);
+
+  if (fromEntity) {
+    const query =
+      fromEntity.type === "album" || fromEntity.type === "song"
+        ? toService === "spotify"
+          ? `${fromEntity.artists.map((artist) => `artist:"${artist.name}"`).join(" ")} ${fromEntity.name}`
+          : `${fromEntity.artists.map((artist) => artist.name).join(" ")} ${fromEntity.name}`
+        : fromEntity.name;
+
+    toEntity =
+      fromUrl.service === "tidal"
+        ? await searchSpotifyEntity(fromUrl.type, query, country)
+        : await searchTidalEntity(fromUrl.type, query, country);
+  }
+} catch (err) {
+  error = err as Error;
+  console.error("Error in convert page:", error);
+
+  const statusCode = getStatusCodeFromError(error);
+  Astro.response.status = statusCode;
+}
+
+let pageTitle = "Convert Music Link";
+if (fromEntity) {
+  const entityName = fromEntity.name;
+  const artists =
+    fromEntity.type !== "artist"
+      ? fromEntity.artists.map((artist) => artist.name).join(", ")
+      : "";
+  const serviceName = toService === "spotify" ? "Spotify" : "Tidal";
+
+  if (fromEntity.type === "artist") {
+    pageTitle = `${entityName} on ${serviceName}`;
+  } else {
+    pageTitle = `${entityName} by ${artists} on ${serviceName}`;
+  }
+}
 ---
 
-<Layout title="Convert Spotify and Tidal links">
-  <main>
-    {
-      fromEntity && (
-        <ContentContainer>
-          <div>
-            {fromUrl.service} {fromEntity.type}
-          </div>
-          <div>{fromEntity.name}</div>
-          <div>{fromEntity.url}</div>
-          <div>{fromEntity.type === "album" && fromEntity.releaseDate}</div>
-          <div>
-            {(fromEntity.type === "album" || fromEntity.type === "song") &&
-              fromEntity.artists.join(", ")}
-          </div>
-          <div>
-            {fromEntity.type === "album" &&
-              fromEntity.images.map((image) => image.url).join(", ")}
-          </div>
-          <div>{fromEntity.type === "song" && fromEntity.duration}</div>
-          <div>{fromEntity.type === "song" && fromEntity.isrc}</div>
-        </ContentContainer>
-      )
-    }
-    {error && <div>{error}</div>}
+<Layout title={pageTitle}>
+  <main class="fade-in">
+    <ContentContainer>
+      <div class="header">
+        <div class="logo">
+          <Logo width="48" height="48" />
+        </div>
+        <h1><a href="/">Convert Music Link</a></h1>
+        <p class="subtitle">
+          {
+            error ? (
+              <>
+                {error instanceof ValidationError
+                  ? "Invalid URL format. Please check your link and try again."
+                  : "An error occurred while processing your request."}
+              </>
+            ) : fromEntity && toService ? (
+              <>
+                You wanted to retrieve <cite>{fromEntity.name}</cite>
+                {fromEntity.type !== "artist" && (
+                  <>
+                    {" "}
+                    by{" "}
+                    {fromEntity.artists.map((artist) => artist.name).join(", ")}
+                  </>
+                )}{" "}
+                on {toService === "spotify" ? "Spotify" : "Tidal"}
+                {toEntity ? (
+                  <> and I found it.</>
+                ) : (
+                  <> but I couldn't find a match.</>
+                )}
+              </>
+            ) : null
+          }
+        </p>
+      </div>
+
+      <div class="conversion-content">
+        {toEntity && <MusicCard entity={toEntity} service={toService!} />}
+
+        {
+          !fromEntity && fromUrl && fromService && (
+            <p class="no-results">
+              The {fromUrl.type} you specified wasn't found on{" "}
+              {fromService === "spotify" ? "Spotify" : "Tidal"}.
+            </p>
+          )
+        }
+
+        {toEntity && <div class="arrow">↑</div>}
+
+        {fromEntity && <MusicCard entity={fromEntity} service={fromService!} />}
+
+        {
+          fromEntity && !toEntity && !error && (
+            <p class="no-results">
+              No match was found on{" "}
+              {toService === "spotify" ? "Spotify" : "Tidal"}
+            </p>
+          )
+        }
+
+        <div class="back-link">
+          <a href="/">← Convert another link</a>
+        </div>
+      </div>
+    </ContentContainer>
   </main>
+  <Footer />
 </Layout>
+
+<style>
+  .header {
+    text-align: center;
+    margin-bottom: var(--space-3xl);
+  }
+
+  .header h1 {
+    background: none;
+    -webkit-background-clip: initial;
+    -webkit-text-fill-color: initial;
+    background-clip: initial;
+  }
+
+  .header h1 a {
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .header h1 a:hover {
+    color: var(--text-primary);
+  }
+
+  .logo {
+    margin-bottom: var(--space-lg);
+  }
+
+  .subtitle {
+    font-size: 1.125rem;
+    margin: 0;
+  }
+
+  .back-link {
+    margin-top: var(--space-2xl);
+    text-align: center;
+  }
+
+  .conversion-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-lg);
+  }
+
+  .arrow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: var(--space-lg) 0;
+    font-size: 2rem;
+  }
+
+  .no-results {
+    color: var(--text-secondary);
+    font-size: 1.125rem;
+    margin: var(--space-xl) 0;
+    padding: var(--space-lg);
+    background: var(--bg-card);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    max-width: 400px;
+    text-align: center;
+  }
+</style>

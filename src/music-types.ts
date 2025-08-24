@@ -6,13 +6,16 @@ interface BaseMusicEntity {
   type: MusicEntityType;
   name: string;
   url: string;
+  images: Image[];
 }
 
 export interface Album extends BaseMusicEntity {
   type: "album";
   releaseDate: string;
-  images: Image[];
-  artists: string[];
+  artists: {
+    name: string;
+    url: string;
+  }[];
 }
 
 export interface Artist extends BaseMusicEntity {
@@ -21,9 +24,17 @@ export interface Artist extends BaseMusicEntity {
 
 export interface Song extends BaseMusicEntity {
   type: "song";
-  duration: string;
+  durationSeconds: number;
+  durationFormatted: string;
   isrc: string;
-  artists: string[];
+  artists: {
+    name: string;
+    url: string;
+  }[];
+  album: {
+    name: string;
+    url: string;
+  };
 }
 
 export interface Image {

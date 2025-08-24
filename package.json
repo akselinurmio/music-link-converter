@@ -13,6 +13,7 @@
 	"dependencies": {
 		"@astrojs/cloudflare": "^12.6.4",
 		"@badgateway/oauth2-client": "^3.3.0",
+		"@js-temporal/polyfill": "^0.5.1",
 		"astro": "^5.13.2"
 	},
 	"devDependencies": {

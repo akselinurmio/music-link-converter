@@ -1,0 +1,105 @@
+---
+export const prerender = true;
+
+import Layout from "../layouts/Layout.astro";
+import ContentContainer from "../components/ContentContainer.astro";
+import Footer from "../components/Footer.astro";
+import Logo from "../assets/logo.svg";
+---
+
+<Layout title="Page Not Found | Music Link Converter">
+  <main class="fade-in">
+    <ContentContainer>
+      <div class="error-content">
+        <div class="error-icon">
+          <Logo width="64" height="64" />
+        </div>
+
+        <h1>Page Not Found</h1>
+
+        <p class="error-description">
+          Oops! The page you're looking for doesn't exist. It might have been
+          moved, deleted, or you entered the wrong URL.
+        </p>
+
+        <div class="error-actions">
+          <a href="/" class="primary-button"> Go Back Home </a>
+          <a href="/convert" class="secondary-button">
+            Try Converting a Link
+          </a>
+        </div>
+      </div>
+    </ContentContainer>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  .error-content {
+    text-align: center;
+    margin-bottom: var(--space-3xl);
+  }
+
+  .error-icon {
+    margin-bottom: var(--space-lg);
+  }
+
+  .error-description {
+    font-size: 1.25rem;
+    max-width: 600px;
+    margin: 0 auto var(--space-2xl) auto;
+    color: var(--text-secondary);
+  }
+
+  .error-actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-lg);
+    flex-wrap: wrap;
+  }
+
+  .primary-button {
+    display: inline-block;
+    background: var(--gradient-primary);
+    color: white;
+    padding: var(--space-md) var(--space-xl);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    font-weight: 500;
+    transition:
+      transform var(--transition-normal),
+      box-shadow var(--transition-normal);
+    box-shadow: var(--shadow-md);
+  }
+
+  .primary-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .secondary-button {
+    display: inline-block;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    padding: var(--space-md) var(--space-xl);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    font-weight: 500;
+    border: 1px solid var(--border-primary);
+    transition:
+      transform var(--transition-normal),
+      box-shadow var(--transition-normal);
+  }
+
+  .secondary-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  @media (max-width: 768px) {
+    .error-actions {
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+  }
+</style>
