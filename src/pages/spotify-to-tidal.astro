@@ -3,12 +3,9 @@ export const prerender = true;
 
 import AlbumIcon from "../assets/album.svg";
 import ArrowRightIcon from "../assets/arrow-right.svg";
-import CheckIcon from "../assets/check.svg";
 import Logo from "../assets/logo.svg";
 import MusicIcon from "../assets/music.svg";
-import ShieldIcon from "../assets/shield.svg";
 import SpotifyLogo from "../assets/spotify.svg";
-import StarIcon from "../assets/star.svg";
 import TidalLogo from "../assets/tidal.svg";
 import UserIcon from "../assets/user.svg";
 import ContentContainer from "../components/ContentContainer.astro";
@@ -49,43 +46,28 @@ import Layout from "../layouts/Layout.astro";
           recommendations.
         </p>
 
-        <div class="benefits">
-          <div class="benefit">
-            <StarIcon width="24" height="24" />
-            <span>High-fidelity audio quality</span>
-          </div>
-          <div class="benefit">
-            <CheckIcon width="24" height="24" />
-            <span>Instant conversion</span>
-          </div>
-          <div class="benefit">
-            <ShieldIcon width="24" height="24" />
-            <span>Secure & private</span>
-          </div>
+        <div class="form-section">
+          <UrlForm
+            placeholder="Paste your Spotify link here..."
+            buttonText="Convert to Tidal"
+          />
         </div>
-      </div>
 
-      <div class="form-section">
-        <UrlForm
-          placeholder="Paste your Spotify link here..."
-          buttonText="Convert to Tidal"
-        />
-      </div>
-
-      <div class="examples">
-        <h3>Supported Spotify Content</h3>
-        <div class="content-types">
-          <div class="content-type">
-            <MusicIcon width="32" height="32" />
-            <span>Tracks</span>
-          </div>
-          <div class="content-type">
-            <AlbumIcon width="32" height="32" />
-            <span>Albums</span>
-          </div>
-          <div class="content-type">
-            <UserIcon width="32" height="32" />
-            <span>Artists</span>
+        <div class="examples">
+          <h2>Supported Spotify Content</h2>
+          <div class="content-types">
+            <div class="content-type">
+              <MusicIcon width="32" height="32" />
+              <span>Tracks</span>
+            </div>
+            <div class="content-type">
+              <AlbumIcon width="32" height="32" />
+              <span>Albums</span>
+            </div>
+            <div class="content-type">
+              <UserIcon width="32" height="32" />
+              <span>Artists</span>
+            </div>
           </div>
         </div>
       </div>
@@ -97,7 +79,6 @@ import Layout from "../layouts/Layout.astro";
 <style>
   .hero-content {
     text-align: center;
-    margin-bottom: var(--space-3xl);
   }
 
   .hero-icon {
@@ -133,11 +114,6 @@ import Layout from "../layouts/Layout.astro";
     color: white;
   }
 
-  .arrow {
-    color: var(--accent-primary);
-    animation: pulse 2s infinite;
-  }
-
   .hero-description {
     font-size: 1.25rem;
     max-width: 600px;
@@ -151,18 +127,6 @@ import Layout from "../layouts/Layout.astro";
     gap: var(--space-xl);
     flex-wrap: wrap;
     margin-bottom: var(--space-2xl);
-  }
-
-  .benefit {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    color: var(--text-secondary);
-    font-weight: 500;
-  }
-
-  .benefit svg {
-    color: var(--accent-success);
   }
 
   .form-section {
@@ -199,35 +163,5 @@ import Layout from "../layouts/Layout.astro";
 
   .content-type span {
     font-weight: 500;
-  }
-
-  @keyframes pulse {
-    0%,
-    100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.5;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .platform-header {
-      flex-direction: column;
-      gap: var(--space-md);
-    }
-
-    .arrow {
-      transform: rotate(90deg);
-    }
-
-    .benefits {
-      flex-direction: column;
-      gap: var(--space-md);
-    }
-
-    .content-types {
-      gap: var(--space-lg);
-    }
   }
 </style>

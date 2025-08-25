@@ -1,14 +1,13 @@
 ---
 export const prerender = true;
 
-import Layout from "../layouts/Layout.astro";
-import ContentContainer from "../components/ContentContainer.astro";
-import UrlForm from "../components/UrlForm.astro";
-import Footer from "../components/Footer.astro";
 import Logo from "../assets/logo.svg";
 import SpotifyLogo from "../assets/spotify.svg";
 import TidalLogo from "../assets/tidal.svg";
-import CheckIcon from "../assets/check.svg";
+import ContentContainer from "../components/ContentContainer.astro";
+import Footer from "../components/Footer.astro";
+import UrlForm from "../components/UrlForm.astro";
+import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout canonicalPath="/">
@@ -25,21 +24,6 @@ import CheckIcon from "../assets/check.svg";
           Transform any track, album, or artist URL from one platform to another
           instantly. Free, fast, and open source.
         </p>
-
-        <div class="features">
-          <div class="feature">
-            <CheckIcon width="24" height="24" />
-            <span>Instant conversion</span>
-          </div>
-          <div class="feature">
-            <CheckIcon width="24" height="24" />
-            <span>No registration required</span>
-          </div>
-          <div class="feature">
-            <CheckIcon width="24" height="24" />
-            <span>100% free to use</span>
-          </div>
-        </div>
       </div>
 
       <div class="form-section">
@@ -50,7 +34,7 @@ import CheckIcon from "../assets/check.svg";
       </div>
 
       <div class="examples">
-        <h3>Supported platforms</h3>
+        <h2>Supported platforms</h2>
         <div class="platforms">
           <a href="/spotify-to-tidal" class="platform">
             <div class="platform-icon spotify">
@@ -74,7 +58,6 @@ import CheckIcon from "../assets/check.svg";
 <style>
   .hero-content {
     text-align: center;
-    margin-bottom: var(--space-3xl);
   }
 
   .hero-icon {
@@ -88,28 +71,12 @@ import CheckIcon from "../assets/check.svg";
     color: var(--text-secondary);
   }
 
-  .features {
-    display: flex;
-    justify-content: center;
-    gap: var(--space-xl);
-    flex-wrap: wrap;
-    margin-bottom: var(--space-2xl);
-  }
-
-  .feature {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    color: var(--text-secondary);
-    font-weight: 500;
-  }
-
-  .feature svg {
-    color: var(--accent-success);
-  }
-
   .form-section {
     margin-bottom: var(--space-3xl);
+  }
+
+  .examples {
+    text-align: center;
   }
 
   .platforms {
@@ -117,7 +84,12 @@ import CheckIcon from "../assets/check.svg";
     align-items: center;
     justify-content: center;
     gap: var(--space-lg);
-    flex-wrap: wrap;
+  }
+
+  @media (max-width: 768px) {
+    .platforms {
+      gap: var(--space-sm);
+    }
   }
 
   .platform {
@@ -186,22 +158,6 @@ import CheckIcon from "../assets/check.svg";
     }
     50% {
       opacity: 0.5;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .features {
-      flex-direction: column;
-      gap: var(--space-md);
-    }
-
-    .platforms {
-      flex-direction: column;
-      gap: var(--space-md);
-    }
-
-    .platform-arrow {
-      transform: rotate(90deg);
     }
   }
 </style>
