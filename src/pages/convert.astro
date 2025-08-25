@@ -150,11 +150,9 @@ if (fromEntity && toEntity) {
 >
   <ContentContainer>
     <div class="header">
-      <div class="logo">
-        <a href="/" title="Home">
-          <Logo width="48" height="48" />
-        </a>
-      </div>
+      <a href="/" title="Home" class="logo">
+        <Logo width="48" height="48" />
+      </a>
       <h1>{error ? "Error" : "Success!"}</h1>
       <p class="subtitle">
         {
@@ -229,11 +227,9 @@ if (fromEntity && toEntity) {
   }
 
   .logo {
+    display: block;
     margin-bottom: var(--space-lg);
-  }
-
-  .logo a {
-    color: inherit;
+    color: var(--text-primary);
   }
 
   .subtitle {
