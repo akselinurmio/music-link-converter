@@ -1,8 +1,8 @@
 ---
-import type { MusicEntity } from "../music-types";
-import { getImageByWidth } from "../utils/images";
 import SpotifyLogo from "../assets/spotify.svg";
 import TidalLogo from "../assets/tidal.svg";
+import type { MusicEntity } from "../music-types";
+import { getImageByWidth } from "../utils/images";
 
 interface Props {
   entity: MusicEntity;
@@ -11,7 +11,7 @@ interface Props {
 
 const { entity, service } = Astro.props;
 
-const minWidth = 230;
+const minWidth = 140;
 const { image1x, image2x } = getImageByWidth(entity.images, minWidth);
 ---
 
@@ -55,6 +55,10 @@ const { image1x, image2x } = getImageByWidth(entity.images, minWidth);
       )
     }
     <div class="tags">
+      <div class="tag">
+        {service === "spotify" ? "Spotify" : "Tidal"}
+        {entity.type}
+      </div>
       {
         entity.type === "song" && (
           <div class="tag">
@@ -64,7 +68,6 @@ const { image1x, image2x } = getImageByWidth(entity.images, minWidth);
           </div>
         )
       }
-      <div class="tag">{entity.type}</div>
     </div>
   </div>
   <div class="service-logo">
@@ -83,10 +86,11 @@ const { image1x, image2x } = getImageByWidth(entity.images, minWidth);
     background-color: var(--bg-primary);
     color: var(--text-primary);
     width: 100%;
-    max-width: 800px;
+    max-width: 500px;
     text-align: left;
     position: relative;
     transition:
+      border-color var(--transition-normal),
       transform var(--transition-normal),
       box-shadow var(--transition-normal);
     border: 1px solid var(--border-primary);
@@ -99,25 +103,30 @@ const { image1x, image2x } = getImageByWidth(entity.images, minWidth);
   }
 
   .card.spotify {
-    border-color: rgba(30, 215, 96, 0.2);
+    border-color: rgb(30, 215, 96, 0.2);
+  }
+  .card.spotify:hover {
+    border-color: rgb(30, 215, 96, 0.4);
   }
 
   .card.tidal {
-    border-color: var(--border-primary);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  .card.tidal:hover {
+    border-color: rgba(255, 255, 255, 0.4);
   }
 
   .image {
     display: block;
     width: 100%;
     height: auto;
-    border-radius: var(--radius-md);
     box-shadow: var(--shadow-sm);
   }
 
   .text-container {
     display: flex;
     flex-direction: column;
-    gap: var(--space-sm);
+    gap: var(--space-xs);
   }
 
   .title {
@@ -170,10 +179,10 @@ const { image1x, image2x } = getImageByWidth(entity.images, minWidth);
   }
 
   .card.spotify .service-logo {
-    color: #1db954;
+    color: #1ed760;
   }
 
   .card.tidal .service-logo {
-    color: var(--text-secondary);
+    color: #ffffff;
   }
 </style>

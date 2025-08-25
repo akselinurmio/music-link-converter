@@ -8,7 +8,7 @@ import type {
   Song,
 } from "../music-types";
 import { APIError } from "../utils/errors";
-import { formatDuration } from "../utils/duration";
+import { formatDuration } from "../utils/format";
 
 type SpotifyEntityType = "album" | "artist" | "track";
 
@@ -223,6 +223,8 @@ export async function searchSpotifyEntity(
         return SpotifyArtistSearchSchema;
       case "song":
         return SpotifyTrackSearchSchema;
+      default:
+        throw new Error(`Unsupported Spotify entity type: ${type}`);
     }
   })();
 
@@ -259,6 +261,23 @@ function mapEntityTypeToSpotifyType(type: MusicEntityType): SpotifyEntityType {
       return "artist";
     case "song":
       return "track";
+    default:
+      throw new Error(`Unsupported Spotify entity type: ${type}`);
+  }
+}
+
+export function spotifyEntityTypeToMusicEntityType(
+  type: string,
+): MusicEntityType {
+  switch (type) {
+    case "album":
+      return "album";
+    case "artist":
+      return "artist";
+    case "track":
+      return "song";
+    default:
+      throw new Error(`Unsupported Spotify entity type: ${type}`);
   }
 }
 
@@ -268,4 +287,10 @@ function normalizeQuery(query: string) {
     .replace(/\p{C}+/gu, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+export function assertSpotifyEntityId(id: string | undefined): void {
+  if (!id || !/^[a-zA-Z0-9]+$/.test(id)) {
+    throw new Error(`Invalid Spotify entity ID: ${id}`);
+  }
 }

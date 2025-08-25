@@ -42,14 +42,14 @@ metaDescription ||=
     <meta property="og:title" content={title} />
     <meta property="og:description" content={metaDescription} />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content={canonicalUrl} />
+    {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
     <meta property="og:image" content={ogImageUrl} />
     <meta property="og:image:alt" content="Music Link Converter" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
       rel="stylesheet"
     />
   </head>
@@ -81,7 +81,6 @@ metaDescription ||=
     --accent-error: #ef4444;
 
     --border-primary: #2a2a2a;
-    --border-secondary: #333333;
 
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
@@ -129,6 +128,7 @@ metaDescription ||=
     margin: 0;
     padding: 0;
     font-family: var(--font-sans);
+    font-optical-sizing: auto;
     background: var(--gradient-primary) var(--bg-primary) fixed;
     color: var(--text-primary);
     line-height: 1.6;
@@ -147,9 +147,7 @@ metaDescription ||=
   h5,
   h6 {
     margin: 0 0 var(--space-md) 0;
-    font-weight: 600;
     line-height: 1.2;
-    letter-spacing: -0.025em;
   }
 
   h1 {

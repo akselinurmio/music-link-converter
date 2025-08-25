@@ -9,7 +9,7 @@ import type {
 } from "../music-types";
 import { APIError } from "../utils/errors";
 import { Temporal } from "@js-temporal/polyfill";
-import { formatDuration } from "../utils/duration";
+import { formatDuration } from "../utils/format";
 
 class TidalClient {
   private client: OAuth2Client;
@@ -284,6 +284,8 @@ export async function getTidalEntity(
       return getArtist(id, countryCode);
     case "song":
       return getSong(id, countryCode);
+    default:
+      throw new Error(`Unsupported Tidal entity type: ${type}`);
   }
 }
 
@@ -336,8 +338,8 @@ export function tidalShareUrlTypeToEntityType(type: string): MusicEntityType {
   }
 }
 
-export function assertTidalEntityId(id: string): void {
-  if (!/^\d+$/.test(id)) {
+export function assertTidalEntityId(id: string | undefined): void {
+  if (!id || !/^\d+$/.test(id)) {
     throw new Error(`Invalid Tidal entity ID: ${id}`);
   }
 }

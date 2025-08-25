@@ -6,7 +6,12 @@ import ContentContainer from "../components/ContentContainer.astro";
 import MusicCard from "../components/MusicCard.astro";
 import Layout from "../layouts/Layout.astro";
 import type { MusicEntity, MusicEntityType } from "../music-types";
-import { getSpotifyEntity, searchSpotifyEntity } from "../services/spotify";
+import {
+  assertSpotifyEntityId,
+  getSpotifyEntity,
+  searchSpotifyEntity,
+  spotifyEntityTypeToMusicEntityType,
+} from "../services/spotify";
 import {
   assertTidalEntityId,
   getTidalEntity,
@@ -33,7 +38,12 @@ async function getUrlData(): Promise<ParsedUrl> {
 
     if (protocol === "spotify:") {
       const [type, id] = pathname.split(":");
-      return { service: "spotify", type: type as MusicEntityType, id };
+      assertSpotifyEntityId(id);
+      return {
+        service: "spotify",
+        type: spotifyEntityTypeToMusicEntityType(type),
+        id,
+      };
     } else if (protocol === "tidal:") {
       const type = tidalShareUrlTypeToEntityType(hostname);
       const id = pathname.slice(1);
@@ -42,9 +52,14 @@ async function getUrlData(): Promise<ParsedUrl> {
     } else if (protocol === "https:" || protocol === "http:") {
       if (hostname === "open.spotify.com") {
         const pathParts = pathname.split("/");
-        const type = pathParts[1] as MusicEntityType;
+        const type = pathParts[1];
         const id = pathParts[2];
-        return { service: "spotify", type, id };
+        assertSpotifyEntityId(id);
+        return {
+          service: "spotify",
+          type: spotifyEntityTypeToMusicEntityType(type),
+          id,
+        };
       } else if (hostname === "tidal.com") {
         const pathParts = pathname.split("/");
         const type = tidalShareUrlTypeToEntityType(pathParts[2]);
@@ -67,7 +82,6 @@ async function getUrlData(): Promise<ParsedUrl> {
 const country = Astro.request.cf?.country as string | undefined;
 
 let fromUrl: ParsedUrl | null = null;
-let fromService: "spotify" | "tidal" | null = null;
 let toService: "spotify" | "tidal" | null = null;
 let fromEntity: MusicEntity | null = null;
 let toEntity: MusicEntity | null = null;
@@ -75,8 +89,7 @@ let error: Error | null = null;
 
 try {
   fromUrl = await getUrlData();
-  fromService = fromUrl.service;
-  toService = fromService === "spotify" ? "tidal" : "spotify";
+  toService = fromUrl.service === "spotify" ? "tidal" : "spotify";
 
   fromEntity =
     fromUrl.service === "tidal"
@@ -100,11 +113,10 @@ try {
   error = err as Error;
   console.error("Error in convert page:", error);
 
-  const statusCode = getStatusCodeFromError(error);
-  Astro.response.status = statusCode;
+  Astro.response.status = getStatusCodeFromError(error);
 }
 
-let pageTitle = "Convert Music Link";
+let pageTitle = "Error";
 if (fromEntity) {
   const entityName = fromEntity.name;
   const artists =
@@ -129,20 +141,27 @@ if (fromEntity && toEntity) {
   <ContentContainer>
     <div class="header">
       <div class="logo">
-        <Logo width="48" height="48" />
+        <a href="/">
+          <Logo width="48" height="48" />
+        </a>
       </div>
-      <h1><a href="/">Convert Music Link</a></h1>
+      <h1>{error ? "Error" : "Success!"}</h1>
       <p class="subtitle">
         {
           error ? (
             <>
               {error instanceof ValidationError
-                ? "Invalid URL format. Please check your link and try again."
+                ? "We couldn't process your link. Note that we only support Spotify and Tidal links, and that playlist links are not supported. Please check your link and try again."
                 : "An error occurred while processing your request."}
             </>
           ) : fromEntity && toService ? (
             <>
-              You wanted to retrieve <cite>{fromEntity.name}</cite>
+              {toEntity ? (
+                <>We retrieved </>
+              ) : (
+                <>Unfortunately, we couldn't find a match for </>
+              )}
+              <cite>{fromEntity.name}</cite>
               {fromEntity.type !== "artist" && (
                 <>
                   {" "}
@@ -150,12 +169,7 @@ if (fromEntity && toEntity) {
                   {fromEntity.artists.map((artist) => artist.name).join(", ")}
                 </>
               )}{" "}
-              on {toService === "spotify" ? "Spotify" : "Tidal"}
-              {toEntity ? (
-                <> and I found it.</>
-              ) : (
-                <> but I couldn't find a match.</>
-              )}
+              on {toService === "spotify" ? "Spotify" : "Tidal"} for you.
             </>
           ) : null
         }
@@ -166,17 +180,21 @@ if (fromEntity && toEntity) {
       {toEntity && <MusicCard entity={toEntity} service={toService!} />}
 
       {
-        !fromEntity && fromUrl && fromService && (
+        !fromEntity && fromUrl && (
           <p class="no-results">
             The {fromUrl.type} you specified wasn't found on{" "}
-            {fromService === "spotify" ? "Spotify" : "Tidal"}.
+            {fromUrl.service === "spotify" ? "Spotify" : "Tidal"}.
           </p>
         )
       }
 
       {toEntity && <div class="arrow">↑</div>}
 
-      {fromEntity && <MusicCard entity={fromEntity} service={fromService!} />}
+      {
+        fromEntity && fromUrl && (
+          <MusicCard entity={fromEntity} service={fromUrl.service} />
+        )
+      }
 
       {
         fromEntity && !toEntity && !error && (
@@ -197,27 +215,15 @@ if (fromEntity && toEntity) {
 <style>
   .header {
     text-align: center;
-    margin-bottom: var(--space-3xl);
-  }
-
-  .header h1 {
-    background: none;
-    -webkit-background-clip: initial;
-    -webkit-text-fill-color: initial;
-    background-clip: initial;
-  }
-
-  .header h1 a {
-    text-decoration: none;
-    transition: color var(--transition-fast);
-  }
-
-  .header h1 a:hover {
-    color: var(--text-primary);
+    margin-bottom: var(--space-2xl);
   }
 
   .logo {
     margin-bottom: var(--space-lg);
+  }
+
+  .logo a {
+    color: inherit;
   }
 
   .subtitle {
@@ -241,7 +247,6 @@ if (fromEntity && toEntity) {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: var(--space-lg) 0;
     font-size: 2rem;
   }
 
