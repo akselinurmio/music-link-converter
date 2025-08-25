@@ -120,6 +120,10 @@ if (fromEntity) {
     pageTitle = `${entityName} by ${artists} on ${serviceName}`;
   }
 }
+
+if (fromEntity && toEntity) {
+  Astro.response.headers.set("Cache-Control", "max-age=10800");
+}
 ---
 
 <Layout title={pageTitle}>
