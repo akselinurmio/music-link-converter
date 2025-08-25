@@ -3,7 +3,6 @@ export const prerender = false;
 
 import Logo from "../assets/logo.svg";
 import ContentContainer from "../components/ContentContainer.astro";
-import Footer from "../components/Footer.astro";
 import MusicCard from "../components/MusicCard.astro";
 import Layout from "../layouts/Layout.astro";
 import type { MusicEntity, MusicEntityType } from "../music-types";
@@ -127,75 +126,72 @@ if (fromEntity && toEntity) {
 ---
 
 <Layout title={pageTitle}>
-  <main class="fade-in">
-    <ContentContainer>
-      <div class="header">
-        <div class="logo">
-          <Logo width="48" height="48" />
-        </div>
-        <h1><a href="/">Convert Music Link</a></h1>
-        <p class="subtitle">
-          {
-            error ? (
-              <>
-                {error instanceof ValidationError
-                  ? "Invalid URL format. Please check your link and try again."
-                  : "An error occurred while processing your request."}
-              </>
-            ) : fromEntity && toService ? (
-              <>
-                You wanted to retrieve <cite>{fromEntity.name}</cite>
-                {fromEntity.type !== "artist" && (
-                  <>
-                    {" "}
-                    by{" "}
-                    {fromEntity.artists.map((artist) => artist.name).join(", ")}
-                  </>
-                )}{" "}
-                on {toService === "spotify" ? "Spotify" : "Tidal"}
-                {toEntity ? (
-                  <> and I found it.</>
-                ) : (
-                  <> but I couldn't find a match.</>
-                )}
-              </>
-            ) : null
-          }
-        </p>
+  <ContentContainer>
+    <div class="header">
+      <div class="logo">
+        <Logo width="48" height="48" />
       </div>
-
-      <div class="conversion-content">
-        {toEntity && <MusicCard entity={toEntity} service={toService!} />}
-
+      <h1><a href="/">Convert Music Link</a></h1>
+      <p class="subtitle">
         {
-          !fromEntity && fromUrl && fromService && (
-            <p class="no-results">
-              The {fromUrl.type} you specified wasn't found on{" "}
-              {fromService === "spotify" ? "Spotify" : "Tidal"}.
-            </p>
-          )
+          error ? (
+            <>
+              {error instanceof ValidationError
+                ? "Invalid URL format. Please check your link and try again."
+                : "An error occurred while processing your request."}
+            </>
+          ) : fromEntity && toService ? (
+            <>
+              You wanted to retrieve <cite>{fromEntity.name}</cite>
+              {fromEntity.type !== "artist" && (
+                <>
+                  {" "}
+                  by{" "}
+                  {fromEntity.artists.map((artist) => artist.name).join(", ")}
+                </>
+              )}{" "}
+              on {toService === "spotify" ? "Spotify" : "Tidal"}
+              {toEntity ? (
+                <> and I found it.</>
+              ) : (
+                <> but I couldn't find a match.</>
+              )}
+            </>
+          ) : null
         }
+      </p>
+    </div>
 
-        {toEntity && <div class="arrow">↑</div>}
+    <div class="conversion-content">
+      {toEntity && <MusicCard entity={toEntity} service={toService!} />}
 
-        {fromEntity && <MusicCard entity={fromEntity} service={fromService!} />}
+      {
+        !fromEntity && fromUrl && fromService && (
+          <p class="no-results">
+            The {fromUrl.type} you specified wasn't found on{" "}
+            {fromService === "spotify" ? "Spotify" : "Tidal"}.
+          </p>
+        )
+      }
 
-        {
-          fromEntity && !toEntity && !error && (
-            <p class="no-results">
-              No match was found on{" "}
-              {toService === "spotify" ? "Spotify" : "Tidal"}
-            </p>
-          )
-        }
+      {toEntity && <div class="arrow">↑</div>}
 
-        <div class="back-link">
-          <a href="/">← Convert another link</a>
-        </div>
+      {fromEntity && <MusicCard entity={fromEntity} service={fromService!} />}
+
+      {
+        fromEntity && !toEntity && !error && (
+          <p class="no-results">
+            No match was found on{" "}
+            {toService === "spotify" ? "Spotify" : "Tidal"}
+          </p>
+        )
+      }
+
+      <div class="back-link">
+        <a href="/">← Convert another link</a>
       </div>
-    </ContentContainer>
-  </main>
-  <Footer />
+    </div>
+  </ContentContainer>
 </Layout>
 
 <style>
@@ -254,7 +250,7 @@ if (fromEntity && toEntity) {
     font-size: 1.125rem;
     margin: var(--space-xl) 0;
     padding: var(--space-lg);
-    background: var(--bg-card);
+    background: var(--bg-primary);
     border: 1px solid var(--border-primary);
     border-radius: var(--radius-lg);
     max-width: 400px;

@@ -9,7 +9,6 @@ import SpotifyLogo from "../assets/spotify.svg";
 import TidalLogo from "../assets/tidal.svg";
 import UserIcon from "../assets/user.svg";
 import ContentContainer from "../components/ContentContainer.astro";
-import Footer from "../components/Footer.astro";
 import UrlForm from "../components/UrlForm.astro";
 import Layout from "../layouts/Layout.astro";
 ---
@@ -19,61 +18,57 @@ import Layout from "../layouts/Layout.astro";
   metaDescription="Convert any Spotify track, album, or artist URL to Tidal URL. Free and fast."
   canonicalPath="/spotify-to-tidal"
 >
-  <main class="fade-in">
-    <ContentContainer>
-      <div class="hero-content">
-        <div class="hero-icon">
-          <Logo width="64" height="64" />
+  <ContentContainer>
+    <div class="hero-content">
+      <div class="hero-icon">
+        <Logo width="64" height="64" />
+      </div>
+
+      <div class="platform-header">
+        <div class="platform-icon spotify">
+          <SpotifyLogo width="48" height="48" />
         </div>
-
-        <div class="platform-header">
-          <div class="platform-icon spotify">
-            <SpotifyLogo width="48" height="48" />
-          </div>
-          <div class="arrow">
-            <ArrowRightIcon width="32" height="32" />
-          </div>
-          <div class="platform-icon tidal">
-            <TidalLogo width="48" height="48" />
-          </div>
+        <div class="arrow">
+          <ArrowRightIcon width="32" height="32" />
         </div>
-
-        <h1>Convert Spotify links to Tidal instantly</h1>
-
-        <p class="hero-description">
-          Transform Spotify tracks and artists into Tidal links instantly.
-          Experience high-fidelity audio without missing your network's
-          recommendations.
-        </p>
-
-        <div class="form-section">
-          <UrlForm
-            placeholder="Paste your Spotify link here..."
-            buttonText="Convert to Tidal"
-          />
+        <div class="platform-icon tidal">
+          <TidalLogo width="48" height="48" />
         </div>
+      </div>
 
-        <div class="examples">
-          <h2>Supported Spotify Content</h2>
-          <div class="content-types">
-            <div class="content-type">
-              <MusicIcon width="32" height="32" />
-              <span>Tracks</span>
-            </div>
-            <div class="content-type">
-              <AlbumIcon width="32" height="32" />
-              <span>Albums</span>
-            </div>
-            <div class="content-type">
-              <UserIcon width="32" height="32" />
-              <span>Artists</span>
-            </div>
+      <h1>Convert Spotify links to Tidal instantly</h1>
+
+      <p class="hero-description">
+        Turn Spotify tracks, albums and artists into Tidal links, and experience
+        high-fidelity audio without missing your friends’ recommendations.
+      </p>
+
+      <div class="form-section">
+        <UrlForm
+          placeholder="Paste your Spotify link here..."
+          buttonText="Convert to Tidal"
+        />
+      </div>
+
+      <div class="content-types-section">
+        <h2>Supported Spotify content</h2>
+        <div class="content-types">
+          <div class="content-type">
+            <MusicIcon width="32" height="32" />
+            <span>Tracks</span>
+          </div>
+          <div class="content-type">
+            <AlbumIcon width="32" height="32" />
+            <span>Albums</span>
+          </div>
+          <div class="content-type">
+            <UserIcon width="32" height="32" />
+            <span>Artists</span>
           </div>
         </div>
       </div>
-    </ContentContainer>
-  </main>
-  <Footer />
+    </div>
+  </ContentContainer>
 </Layout>
 
 <style>
@@ -130,14 +125,14 @@ import Layout from "../layouts/Layout.astro";
   }
 
   .form-section {
-    margin-bottom: var(--space-3xl);
+    margin-bottom: var(--space-2xl);
   }
 
-  .examples {
+  .content-types-section {
     text-align: center;
   }
 
-  .examples h3 {
+  .content-types-section h2 {
     margin-bottom: var(--space-lg);
     color: var(--text-primary);
   }

@@ -1,4 +1,6 @@
 ---
+import Footer from "../components/Footer.astro";
+
 interface Props {
   canonicalPath?: string;
   title?: string;
@@ -53,7 +55,10 @@ metaDescription ||=
   </head>
   <body>
     <div class="page-wrapper">
-      <slot />
+      <main class="fade-in">
+        <slot />
+      </main>
+      <Footer />
     </div>
   </body>
 </html>
@@ -61,11 +66,9 @@ metaDescription ||=
 <style is:global>
   :root {
     /* Color Palette */
-    --bg-primary: #0a0a0a;
+    --bg-primary: #1e1e1e;
     --bg-secondary: #111111;
     --bg-tertiary: #1a1a1a;
-    --bg-card: #1e1e1e;
-    --bg-card-hover: #252525;
 
     --text-primary: #ffffff;
     --text-secondary: #a0a0a0;
@@ -161,7 +164,7 @@ metaDescription ||=
 
   h2,
   h3 {
-    font-size: clamp(1.25rem, 3vw, 2rem);
+    font-size: clamp(1.5rem, 3vw, 2rem);
     font-weight: 600;
   }
 
@@ -245,7 +248,7 @@ metaDescription ||=
   textarea,
   select {
     font-family: inherit;
-    background: var(--bg-card);
+    background: var(--bg-primary);
     border: 1px solid var(--border-primary);
     border-radius: var(--radius-md);
     padding: var(--space-md);
@@ -262,22 +265,6 @@ metaDescription ||=
     outline: none;
     border-color: var(--accent-primary);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-  }
-
-  /* Layout */
-  .page-wrapper {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-
-  main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: var(--space-2xl) var(--space-lg);
   }
 
   /* Animations */
@@ -321,5 +308,22 @@ metaDescription ||=
     outline: 2px solid var(--accent-primary);
     outline-offset: 2px;
     border-radius: var(--radius-sm);
+  }
+</style>
+
+<style>
+  .page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: var(--space-2xl) var(--space-lg);
   }
 </style>

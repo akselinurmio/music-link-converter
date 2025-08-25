@@ -3,35 +3,29 @@ export const prerender = true;
 
 import Layout from "../layouts/Layout.astro";
 import ContentContainer from "../components/ContentContainer.astro";
-import Footer from "../components/Footer.astro";
 import Logo from "../assets/logo.svg";
 ---
 
 <Layout title="Page Not Found | Music Link Converter">
-  <main class="fade-in">
-    <ContentContainer>
-      <div class="error-content">
-        <div class="error-icon">
-          <Logo width="64" height="64" />
-        </div>
-
-        <h1>Page Not Found</h1>
-
-        <p class="error-description">
-          Oops! The page you're looking for doesn't exist. It might have been
-          moved, deleted, or you entered the wrong URL.
-        </p>
-
-        <div class="error-actions">
-          <a href="/" class="primary-button"> Go Back Home </a>
-          <a href="/convert" class="secondary-button">
-            Try Converting a Link
-          </a>
-        </div>
+  <ContentContainer>
+    <div class="error-content">
+      <div class="error-icon">
+        <Logo width="64" height="64" />
       </div>
-    </ContentContainer>
-  </main>
-  <Footer />
+
+      <h1>Page Not Found</h1>
+
+      <p class="error-description">
+        Oops! The page you're looking for doesn't exist. It might have been
+        moved, deleted, or you entered the wrong URL.
+      </p>
+
+      <div class="error-actions">
+        <a href="/" class="primary-button"> Go Back Home </a>
+        <a href="/convert" class="secondary-button"> Try Converting a Link </a>
+      </div>
+    </div>
+  </ContentContainer>
 </Layout>
 
 <style>
@@ -79,7 +73,7 @@ import Logo from "../assets/logo.svg";
 
   .secondary-button {
     display: inline-block;
-    background: var(--bg-card);
+    background: var(--bg-primary);
     color: var(--text-primary);
     padding: var(--space-md) var(--space-xl);
     border-radius: var(--radius-lg);
