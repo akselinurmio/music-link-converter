@@ -19,6 +19,7 @@ import {
   tidalShareUrlTypeToEntityType,
 } from "../services/tidal";
 import { getStatusCodeFromError, ValidationError } from "../utils/errors";
+import { toSentenceCase } from "../utils/format";
 
 interface ParsedUrl {
   service: "spotify" | "tidal";
@@ -86,6 +87,7 @@ let toService: "spotify" | "tidal" | null = null;
 let fromEntity: MusicEntity | null = null;
 let toEntity: MusicEntity | null = null;
 let error: Error | null = null;
+let canonicalPath: string | undefined;
 
 try {
   fromUrl = await getUrlData();
@@ -117,31 +119,39 @@ try {
 }
 
 let pageTitle = "Error";
+let metaDescription: string | undefined;
 if (fromEntity) {
   const entityName = fromEntity.name;
   const artists =
     fromEntity.type !== "artist"
       ? fromEntity.artists.map((artist) => artist.name).join(", ")
       : "";
-  const serviceName = toService === "spotify" ? "Spotify" : "Tidal";
+  const serviceName = toSentenceCase(toService || "");
 
   if (fromEntity.type === "artist") {
     pageTitle = `${entityName} on ${serviceName}`;
   } else {
     pageTitle = `${entityName} by ${artists} on ${serviceName}`;
   }
+  metaDescription = `"${fromEntity.name}" by ${artists} is on ${serviceName}. Convert tracks, albums, and artists between Spotify and Tidal instantly with Music Link Converter.`;
 }
 
 if (fromEntity && toEntity) {
   Astro.response.headers.set("Cache-Control", "max-age=10800");
+  canonicalPath = `/convert?url=${encodeURIComponent(fromEntity.url)}`;
 }
 ---
 
-<Layout title={pageTitle}>
+<Layout
+  title={pageTitle}
+  metaDescription={metaDescription}
+  canonicalPath={canonicalPath}
+  ogImageUrl={fromEntity?.images[0]?.url}
+>
   <ContentContainer>
     <div class="header">
       <div class="logo">
-        <a href="/">
+        <a href="/" title="Home">
           <Logo width="48" height="48" />
         </a>
       </div>
@@ -157,7 +167,7 @@ if (fromEntity && toEntity) {
           ) : fromEntity && toService ? (
             <>
               {toEntity ? (
-                <>We retrieved </>
+                <>We found a match for </>
               ) : (
                 <>Unfortunately, we couldn't find a match for </>
               )}
@@ -169,7 +179,7 @@ if (fromEntity && toEntity) {
                   {fromEntity.artists.map((artist) => artist.name).join(", ")}
                 </>
               )}{" "}
-              on {toService === "spotify" ? "Spotify" : "Tidal"} for you.
+              on {toSentenceCase(toService)}.
             </>
           ) : null
         }
@@ -183,7 +193,7 @@ if (fromEntity && toEntity) {
         !fromEntity && fromUrl && (
           <p class="no-results">
             The {fromUrl.type} you specified wasn't found on{" "}
-            {fromUrl.service === "spotify" ? "Spotify" : "Tidal"}.
+            {toSentenceCase(fromUrl.service)}.
           </p>
         )
       }
@@ -232,7 +242,7 @@ if (fromEntity && toEntity) {
   }
 
   .back-link {
-    margin-top: var(--space-2xl);
+    margin-block: var(--space-lg);
     text-align: center;
   }
 
