@@ -5,122 +5,17 @@ import Logo from "../assets/logo.svg";
 import ContentContainer from "../components/ContentContainer.astro";
 import MusicCard from "../components/MusicCard.astro";
 import Layout from "../layouts/Layout.astro";
-import type { MusicEntity, MusicEntityType } from "../music-types";
-import {
-  assertSpotifyEntityId,
-  getSpotifyEntity,
-  searchSpotifyEntity,
-  spotifyEntityTypeToMusicEntityType,
-} from "../services/spotify";
-import {
-  assertTidalEntityId,
-  getTidalEntity,
-  searchTidalEntity,
-  tidalShareUrlTypeToEntityType,
-} from "../services/tidal";
+import { convertMusicLink } from "../services/conversion";
 import { getStatusCodeFromError, ValidationError } from "../utils/errors";
 import { toSentenceCase } from "../utils/format";
+import type { MusicEntity } from "../music-types";
 
-interface ParsedUrl {
-  service: "spotify" | "tidal";
-  type: MusicEntityType;
-  id: string;
-}
+function generatePageTitle(
+  fromEntity: MusicEntity | null,
+  toService: string | null
+): string {
+  if (!fromEntity) return "Error";
 
-async function getUrlData(): Promise<ParsedUrl> {
-  try {
-    const urlParameter = Astro.url.searchParams.get("url");
-
-    if (!urlParameter) {
-      throw new ValidationError("No URL provided");
-    }
-
-    const { protocol, hostname, pathname } = new URL(urlParameter);
-
-    if (protocol === "spotify:") {
-      const [type, id] = pathname.split(":");
-      assertSpotifyEntityId(id);
-      return {
-        service: "spotify",
-        type: spotifyEntityTypeToMusicEntityType(type),
-        id,
-      };
-    } else if (protocol === "tidal:") {
-      const type = tidalShareUrlTypeToEntityType(hostname);
-      const id = pathname.slice(1);
-      assertTidalEntityId(id);
-      return { service: "tidal", type, id };
-    } else if (protocol === "https:" || protocol === "http:") {
-      if (hostname === "open.spotify.com") {
-        const pathParts = pathname.split("/");
-        const type = pathParts[1];
-        const id = pathParts[2];
-        assertSpotifyEntityId(id);
-        return {
-          service: "spotify",
-          type: spotifyEntityTypeToMusicEntityType(type),
-          id,
-        };
-      } else if (hostname === "tidal.com") {
-        const pathParts = pathname.split("/");
-        const type = tidalShareUrlTypeToEntityType(pathParts[2]);
-        const id = pathParts[3];
-        assertTidalEntityId(id);
-        return { service: "tidal", type, id };
-      }
-    }
-
-    throw new ValidationError("Unsupported URL format");
-  } catch (err) {
-    if (err instanceof ValidationError) {
-      throw err;
-    }
-
-    throw new ValidationError("Invalid URL format");
-  }
-}
-
-const country = Astro.request.cf?.country as string | undefined;
-
-let fromUrl: ParsedUrl | null = null;
-let toService: "spotify" | "tidal" | null = null;
-let fromEntity: MusicEntity | null = null;
-let toEntity: MusicEntity | null = null;
-let error: Error | null = null;
-let canonicalPath: string | undefined;
-
-try {
-  fromUrl = await getUrlData();
-  toService = fromUrl.service === "spotify" ? "tidal" : "spotify";
-
-  fromEntity =
-    fromUrl.service === "tidal"
-      ? await getTidalEntity(fromUrl.type, fromUrl.id, country)
-      : await getSpotifyEntity(fromUrl.type, fromUrl.id, country);
-
-  if (fromEntity) {
-    const query =
-      fromEntity.type === "album" || fromEntity.type === "song"
-        ? toService === "spotify"
-          ? `${fromEntity.artists.map((artist) => `artist:"${artist.name}"`).join(" ")} ${fromEntity.name}`
-          : `${fromEntity.artists.map((artist) => artist.name).join(" ")} ${fromEntity.name}`
-        : fromEntity.name;
-
-    toEntity =
-      fromUrl.service === "tidal"
-        ? await searchSpotifyEntity(fromUrl.type, query, country)
-        : await searchTidalEntity(fromUrl.type, query, country);
-  }
-} catch (err) {
-  error = err as Error;
-  console.error("Error in convert page:", error);
-
-  Astro.response.status = getStatusCodeFromError(error);
-}
-
-let pageTitle = "Error";
-let metaDescription: string | undefined;
-if (fromEntity) {
   const entityName = fromEntity.name;
   const artists =
     fromEntity.type !== "artist"
@@ -129,86 +24,140 @@ if (fromEntity) {
   const serviceName = toSentenceCase(toService || "");
 
   if (fromEntity.type === "artist") {
-    pageTitle = `${entityName} on ${serviceName}`;
+    return `${entityName} on ${serviceName}`;
   } else {
-    pageTitle = `${entityName} by ${artists} on ${serviceName}`;
+    return `${entityName} by ${artists} on ${serviceName}`;
   }
-  metaDescription = `"${fromEntity.name}" by ${artists} is on ${serviceName}. Convert tracks, albums, and artists between Spotify and Tidal instantly with Music Link Converter.`;
 }
 
-if (fromEntity && toEntity) {
-  Astro.response.headers.set("Cache-Control", "max-age=10800");
-  canonicalPath = `/convert?url=${encodeURIComponent(fromEntity.url)}`;
+function generateMetaDescription(
+  fromEntity: MusicEntity | null,
+  toService: string | null
+): string | undefined {
+  if (!fromEntity) return undefined;
+
+  const artists =
+    fromEntity.type !== "artist"
+      ? fromEntity.artists.map((artist) => artist.name).join(", ")
+      : "";
+  const serviceName = toSentenceCase(toService || "");
+
+  return `"${fromEntity.name}" by ${artists} is on ${serviceName}. Convert tracks, albums, and artists between Spotify and Tidal instantly with Music Link Converter.`;
 }
+
+function generateCanonicalPath(
+  fromEntity: MusicEntity | null
+): string | undefined {
+  if (!fromEntity) return undefined;
+  return `/convert?url=${encodeURIComponent(fromEntity.url)}`;
+}
+
+function generateOgImageUrl(
+  fromEntity: MusicEntity | null
+): string | undefined {
+  if (!fromEntity?.images?.[0]?.url) return undefined;
+  return fromEntity.images[0].url;
+}
+
+const country = Astro.request.cf?.country as string | undefined;
+const urlParameter = Astro.url.searchParams.get("url");
+
+const result = await convertMusicLink(urlParameter, country);
+
+if (result.error) {
+  Astro.response.status = getStatusCodeFromError(result.error);
+}
+
+if (result.fromEntity && result.toEntity) {
+  Astro.response.headers.set("Cache-Control", "max-age=10800");
+}
+
+const pageTitle = generatePageTitle(result.fromEntity, result.toService);
+const metaDescription = generateMetaDescription(
+  result.fromEntity,
+  result.toService
+);
+const canonicalPath = generateCanonicalPath(result.fromEntity);
+const ogImageUrl = generateOgImageUrl(result.fromEntity);
 ---
 
 <Layout
   title={pageTitle}
   metaDescription={metaDescription}
   canonicalPath={canonicalPath}
-  ogImageUrl={fromEntity?.images[0]?.url}
+  ogImageUrl={ogImageUrl}
 >
   <ContentContainer>
     <div class="header">
       <a href="/" title="Home" class="logo">
         <Logo width="48" height="48" />
       </a>
-      <h1>{error ? "Error" : "Success!"}</h1>
+      <h1>{result.error ? "Error" : "Success!"}</h1>
       <p class="subtitle">
         {
-          error ? (
+          result.error ? (
             <>
-              {error instanceof ValidationError
+              {result.error instanceof ValidationError
                 ? "We couldn't process your link. Note that we only support Spotify and Tidal links, and that playlist links are not supported. Please check your link and try again."
                 : "An error occurred while processing your request."}
             </>
-          ) : fromEntity && toService ? (
+          ) : result.fromEntity && result.toService ? (
             <>
-              {toEntity ? (
+              {result.toEntity ? (
                 <>We found a match for </>
               ) : (
                 <>Unfortunately, we couldn't find a match for </>
               )}
-              <i>{fromEntity.name}</i>
-              {fromEntity.type !== "artist" && (
+              <i>{result.fromEntity.name}</i>
+              {result.fromEntity.type !== "artist" && (
                 <>
                   {" "}
                   by{" "}
-                  {fromEntity.artists.map((artist) => artist.name).join(", ")}
+                  {result.fromEntity.artists
+                    .map((artist) => artist.name)
+                    .join(", ")}
                 </>
               )}{" "}
-              on {toSentenceCase(toService)}.
+              on {toSentenceCase(result.toService)}.
             </>
           ) : null
         }
       </p>
     </div>
 
-    <div class="conversion-content">
-      {toEntity && <MusicCard entity={toEntity} service={toService!} />}
+    <section class="conversion-content">
+      <h2 class="sr-only">Conversion Results</h2>
+      {
+        result.toEntity && (
+          <MusicCard entity={result.toEntity} service={result.toService!} />
+        )
+      }
 
       {
-        !fromEntity && fromUrl && (
+        !result.fromEntity && result.fromUrl && (
           <p class="no-results">
-            The {fromUrl.type} you specified wasn't found on{" "}
-            {toSentenceCase(fromUrl.service)}.
+            The {result.fromUrl.type} you specified wasn't found on{" "}
+            {toSentenceCase(result.fromUrl.service)}.
           </p>
         )
       }
 
-      {toEntity && <div class="arrow">↑</div>}
+      {result.toEntity && <div class="arrow">↑</div>}
 
       {
-        fromEntity && fromUrl && (
-          <MusicCard entity={fromEntity} service={fromUrl.service} />
+        result.fromEntity && result.fromUrl && (
+          <MusicCard
+            entity={result.fromEntity}
+            service={result.fromUrl.service}
+          />
         )
       }
 
       {
-        fromEntity && !toEntity && !error && (
+        result.fromEntity && !result.toEntity && !result.error && (
           <p class="no-results">
             No match was found on{" "}
-            {toService === "spotify" ? "Spotify" : "Tidal"}
+            {result.toService === "spotify" ? "Spotify" : "Tidal"}
           </p>
         )
       }
@@ -216,7 +165,7 @@ if (fromEntity && toEntity) {
       <div class="back-link">
         <a href="/">← Convert another link</a>
       </div>
-    </div>
+    </section>
   </ContentContainer>
 </Layout>
 
@@ -266,5 +215,17 @@ if (fromEntity && toEntity) {
     border-radius: var(--radius-lg);
     max-width: 400px;
     text-align: center;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 </style>
