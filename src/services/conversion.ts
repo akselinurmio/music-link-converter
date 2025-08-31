@@ -50,19 +50,21 @@ async function getUrlData(urlParameter: string | null): Promise<ParsedUrl> {
       return { service: "tidal", type, id };
     } else if (protocol === "https:" || protocol === "http:") {
       if (hostname === "open.spotify.com") {
-        const pathParts = pathname.split("/");
-        const type = pathParts[1];
-        const id = pathParts[2];
+        const pathParts = pathname.split("/").filter((part) => part.length > 0);
+        if (pathParts.length < 2) {
+          throw new ValidationError("Invalid Spotify URL format");
+        }
+        const type = spotifyEntityTypeToMusicEntityType(pathParts.at(-2)!);
+        const id = pathParts.at(-1)!;
         assertSpotifyEntityId(id);
-        return {
-          service: "spotify",
-          type: spotifyEntityTypeToMusicEntityType(type),
-          id,
-        };
+        return { service: "spotify", type, id };
       } else if (hostname === "tidal.com") {
-        const pathParts = pathname.split("/");
-        const type = tidalShareUrlTypeToEntityType(pathParts[2]);
-        const id = pathParts[3];
+        const pathParts = pathname.split("/").filter((part) => part.length > 0);
+        if (pathParts.length < 2) {
+          throw new ValidationError("Invalid Tidal URL format");
+        }
+        const type = tidalShareUrlTypeToEntityType(pathParts.at(-2)!);
+        const id = pathParts.at(-1)!;
         assertTidalEntityId(id);
         return { service: "tidal", type, id };
       }
