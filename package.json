@@ -1,26 +1,25 @@
 {
-	"name": "music-link-converter",
-	"type": "module",
-	"version": "0.0.1",
-	"scripts": {
-		"dev": "astro dev",
-		"build": "astro build",
-		"preview": "astro build && wrangler dev",
-		"astro": "astro",
-		"deploy": "astro build && wrangler deploy",
-		"cf-typegen": "wrangler types"
-	},
-	"dependencies": {
-		"@astrojs/cloudflare": "^12.6.4",
-		"@badgateway/oauth2-client": "^3.3.0",
-		"@js-temporal/polyfill": "^0.5.1",
-		"astro": "^5.13.2"
-	},
-	"devDependencies": {
-		"@types/node": "^24.3.0",
-		"prettier": "3.6.2",
-		"prettier-plugin-astro": "0.14.1",
-		"wrangler": "^4.31.0"
-	},
-	"license": "MIT"
+  "name": "music-link-converter",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro build && wrangler dev",
+    "astro": "astro",
+    "cf-typegen": "wrangler types"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^12.6.4",
+    "@badgateway/oauth2-client": "^3.3.0",
+    "@js-temporal/polyfill": "^0.5.1",
+    "astro": "^5.13.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "prettier": "3.6.2",
+    "prettier-plugin-astro": "0.14.1",
+    "wrangler": "^4.31.0"
+  },
+  "license": "MIT"
 }
