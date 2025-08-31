@@ -61,6 +61,7 @@ function generateOgImageUrl(
 
 const country = Astro.request.cf?.country as string | undefined;
 const urlParameter = Astro.url.searchParams.get("url");
+const shouldRedirect = Astro.url.searchParams.has("redirect");
 
 const result = await convertMusicLink(urlParameter, country);
 
@@ -70,6 +71,10 @@ if (result.error) {
 
 if (result.fromEntity && result.toEntity) {
   Astro.response.headers.set("Cache-Control", "max-age=10800");
+}
+
+if (shouldRedirect && result.toEntity && !result.error) {
+  return Astro.redirect(result.toEntity.url, 302);
 }
 
 const pageTitle = generatePageTitle(result.fromEntity, result.toService);
