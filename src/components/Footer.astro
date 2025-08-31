@@ -5,20 +5,39 @@ import TidalLogo from "../assets/tidal.svg";
 
 <footer class="footer">
   <div class="platforms-section">
-    <h2>Supported platforms</h2>
     <div class="platforms">
-      <a href="/spotify-to-tidal" class="platform">
-        <div class="platform-icon spotify">
-          <SpotifyLogo width="32" height="32" />
-        </div>
-        <span>Spotify to Tidal</span>
-      </a>
-      <a href="/tidal-to-spotify" class="platform">
-        <div class="platform-icon tidal">
-          <TidalLogo width="32" height="32" />
-        </div>
-        <span>Tidal to Spotify</span>
-      </a>
+      <h2>Supported platforms</h2>
+      <div class="platform-links">
+        <a href="/spotify-to-tidal" class="platform">
+          <div class="platform-icon spotify">
+            <SpotifyLogo width="32" height="32" />
+          </div>
+          <span>Spotify to Tidal</span>
+        </a>
+        <a href="/tidal-to-spotify" class="platform">
+          <div class="platform-icon tidal">
+            <TidalLogo width="32" height="32" />
+          </div>
+          <span>Tidal to Spotify</span>
+        </a>
+      </div>
+    </div>
+    <div class="shortcuts">
+      <h2>iOS Shortcuts</h2>
+      <ul>
+        <li>
+          <a href="/shortcuts/Open Spotify link in Tidal.shortcut"
+            >Open Spotify link in Tidal</a
+          >
+        </li>
+      </ul>
+      <ul>
+        <li>
+          <a href="/shortcuts/Open Tidal link in Spotify.shortcut"
+            >Open Tidal link in Spotify</a
+          >
+        </li>
+      </ul>
     </div>
   </div>
   <div class="footer-content">
@@ -50,21 +69,70 @@ import TidalLogo from "../assets/tidal.svg";
   }
 
   .platforms-section {
-    text-align: center;
     padding-block: var(--space-2xl);
     border-bottom: 1px solid var(--border-primary);
+    display: flex;
+    gap: var(--space-2xl);
+    max-width: 800px;
+    margin: 0 auto;
+    padding-inline: var(--space-lg);
   }
 
   .platforms {
+    flex: 1;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
     gap: var(--space-lg);
   }
 
+  .platform-links {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+  }
+
+  .shortcuts {
+    flex: 1;
+    border-left: 1px solid var(--border-primary);
+    padding-left: var(--space-2xl);
+  }
+
+  .shortcuts ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .shortcuts li {
+    margin-bottom: var(--space-sm);
+  }
+
+  .shortcuts a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .shortcuts a:hover {
+    color: var(--text-primary);
+  }
+
   @media (max-width: 768px) {
-    .platforms {
+    .platforms-section {
+      flex-direction: column;
+      gap: var(--space-xl);
+      padding-inline: var(--space-md);
+    }
+
+    .platform-links {
       gap: var(--space-sm);
+    }
+
+    .shortcuts {
+      border-left: none;
+      border-top: 1px solid var(--border-primary);
+      padding-left: 0;
+      padding-top: var(--space-xl);
     }
   }
 
@@ -73,6 +141,7 @@ import TidalLogo from "../assets/tidal.svg";
     flex-direction: column;
     align-items: center;
     gap: var(--space-sm);
+    text-align: center;
     text-decoration: none;
     color: inherit;
     transition:
