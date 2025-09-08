@@ -59,13 +59,16 @@ async function getUrlData(urlParameter: string | null): Promise<ParsedUrl> {
         assertSpotifyEntityId(id);
         return { service: "spotify", type, id };
       } else if (hostname === "tidal.com") {
-        const pathParts = pathname.split("/").filter((part) => part.length > 0);
-        if (pathParts.length < 2) {
+        const match = pathname.match(
+          /\/(?<type>track|album|artist)\/(?<id>\d+)(?:\/|$)/,
+        );
+
+        if (!match) {
           throw new ValidationError("Invalid Tidal URL format");
         }
-        const type = tidalShareUrlTypeToEntityType(pathParts.at(-2)!);
-        const id = pathParts.at(-1)!;
-        assertTidalEntityId(id);
+
+        const type = tidalShareUrlTypeToEntityType(match.groups!.type);
+        const id = match.groups!.id;
         return { service: "tidal", type, id };
       }
     }
