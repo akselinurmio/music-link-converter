@@ -117,7 +117,7 @@ export async function convertMusicLink(
     }
   } catch (err) {
     error = err as Error;
-    console.error("Error in conversion:", error);
+    console.error(err);
   }
 
   return {
