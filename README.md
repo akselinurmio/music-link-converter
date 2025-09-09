@@ -68,6 +68,7 @@ Visit [musiclinkconverter.com](https://musiclinkconverter.com) to start converti
 |---------|--------|
 | `npm run dev` | Start development server |
 | `npm run build` | Build for production |
+| `npm run check` | Run linter |
 | `npm run preview` | Build and preview production build locally |
 | `npm run deploy` | Build and deploy to Cloudflare Workers |
 | `npm run cf-typegen` | Generate Cloudflare types |

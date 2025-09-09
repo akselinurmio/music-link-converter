@@ -5,20 +5,21 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "check": "astro check",
     "preview": "astro build && wrangler dev",
     "astro": "astro",
     "cf-typegen": "wrangler types"
   },
   "dependencies": {
+    "@astrojs/check": "^0.9.4",
     "@astrojs/cloudflare": "^12.6.4",
     "@badgateway/oauth2-client": "^3.3.0",
     "@js-temporal/polyfill": "^0.5.1",
-    "astro": "^5.13.2"
-  },
-  "devDependencies": {
     "@types/node": "^24.3.0",
-    "prettier": "3.6.2",
+    "astro": "^5.13.2",
     "prettier-plugin-astro": "0.14.1",
+    "prettier": "3.6.2",
+    "typescript": "^5.9.2",
     "wrangler": "^4.31.0"
   },
   "license": "MIT"
