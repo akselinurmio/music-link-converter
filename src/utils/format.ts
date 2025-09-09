@@ -1,6 +1,5 @@
-export function formatArtistList(artists: { name: string }[]) {
-  const names = artists.map((a) => a.name);
-  return names.join(", ");
+export function formatArtistList(artists: string[]) {
+  return artists.join(", ");
 }
 
 export function formatDuration(durationSeconds: number) {

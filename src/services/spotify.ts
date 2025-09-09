@@ -8,7 +8,6 @@ import type {
   Song,
 } from "../music-types";
 import { APIError } from "../utils/errors";
-import { formatDuration } from "../utils/format";
 
 type SpotifyEntityType = "album" | "artist" | "track";
 
@@ -139,10 +138,7 @@ function spotifyAlbumToAlbum(album: z.infer<typeof SpotifyAlbumSchema>): Album {
     name: album.name,
     releaseDate: album.release_date,
     url: `https://open.spotify.com/album/${album.id}`,
-    artists: album.artists.map((artist) => ({
-      name: artist.name,
-      url: `https://open.spotify.com/artist/${artist.id}`,
-    })),
+    artists: album.artists.map((artist) => artist.name),
     images: album.images,
   };
 }
@@ -164,13 +160,9 @@ function spotifyTrackToSong(track: z.infer<typeof SpotifyTrackSchema>): Song {
     name: track.name,
     url: `https://open.spotify.com/track/${track.id}`,
     durationSeconds: track.duration_ms / 1000,
-    durationFormatted: formatDuration(track.duration_ms / 1000),
     images: track.album.images,
     isrc: track.external_ids.isrc,
-    artists: track.artists.map((artist) => ({
-      name: artist.name,
-      url: `https://open.spotify.com/artist/${artist.id}`,
-    })),
+    artists: track.artists.map((artist) => artist.name),
     album: {
       name: track.album.name,
       url: `https://open.spotify.com/album/${track.album.id}`,
@@ -292,8 +284,8 @@ export function spotifyEntityTypeToMusicEntityType(
 
 function normalizeQuery(query: string) {
   return query
-    .normalize("NFKC")
-    .replace(/\p{C}+/gu, " ")
+    .normalize("NFC")
+    .replace(/\p{C}+/gu, "")
     .replace(/\s+/g, " ")
     .trim();
 }

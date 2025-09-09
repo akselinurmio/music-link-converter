@@ -2,7 +2,7 @@
 import SpotifyLogo from "../assets/spotify.svg";
 import TidalLogo from "../assets/tidal.svg";
 import type { MusicEntity } from "../music-types";
-import { formatArtistList } from "../utils/format";
+import { formatArtistList, formatDuration } from "../utils/format";
 import { getImageByWidth } from "../utils/images";
 
 interface Props {
@@ -85,7 +85,7 @@ function formatReleaseDateTitle(releaseDate: string) {
         entity.type === "song" && (
           <div class="tag">
             <time datetime={`PT${entity.durationSeconds}S`}>
-              {entity.durationFormatted}
+              {formatDuration(entity.durationSeconds)}
             </time>
           </div>
         )

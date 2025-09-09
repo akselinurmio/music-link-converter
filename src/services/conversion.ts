@@ -130,10 +130,10 @@ function createQuery(entity: MusicEntity, service: "spotify" | "tidal") {
     entity.type !== "artist" &&
     entity.artists.length === 1
   ) {
-    return `${entity.artists.map((artist) => `artist:"${artist.name}"`).join(" ")} ${entity.name}`;
+    return `${entity.artists.map((artist) => `artist:"${artist}"`).join(" ")} ${entity.name}`;
   }
 
   return entity.type === "artist"
     ? entity.name
-    : `${entity.artists.map((artist) => artist.name).join(" ")} ${entity.name}`;
+    : `${entity.artists.join(" ")} ${entity.name}`;
 }

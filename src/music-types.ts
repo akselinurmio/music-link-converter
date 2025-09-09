@@ -12,10 +12,7 @@ interface BaseMusicEntity {
 export interface Album extends BaseMusicEntity {
   type: "album";
   releaseDate: string;
-  artists: {
-    name: string;
-    url: string;
-  }[];
+  artists: string[];
 }
 
 export interface Artist extends BaseMusicEntity {
@@ -25,12 +22,8 @@ export interface Artist extends BaseMusicEntity {
 export interface Song extends BaseMusicEntity {
   type: "song";
   durationSeconds: number;
-  durationFormatted: string;
   isrc: string;
-  artists: {
-    name: string;
-    url: string;
-  }[];
+  artists: string[];
   album: {
     name: string;
     url: string;

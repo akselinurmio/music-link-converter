@@ -9,7 +9,6 @@ import type {
 } from "../music-types";
 import { APIError } from "../utils/errors";
 import { Temporal } from "@js-temporal/polyfill";
-import { formatDuration } from "../utils/format";
 
 class TidalClient {
   private client: OAuth2Client;
@@ -197,10 +196,7 @@ async function getAlbum(id: string, countryCode: string): Promise<Album> {
     name: data.attributes.title,
     releaseDate: data.attributes.releaseDate,
     url: `https://tidal.com/browse/album/${id}`,
-    artists: artists.map((artist) => ({
-      name: artist,
-      url: `https://tidal.com/browse/artist/${artist}`,
-    })),
+    artists,
     images,
   };
 }
@@ -250,10 +246,7 @@ async function getSong(id: string, countryCode: string): Promise<Song> {
   const artists = data.relationships.artists.data
     .map((item) => included.find((artist) => artist.id === item.id)!)
     .filter((item) => item.type === "artists")
-    .map((artist) => ({
-      name: artist.attributes.name,
-      url: `https://tidal.com/browse/artist/${artist.id}`,
-    }));
+    .map((artist) => artist.attributes.name);
 
   const images = albumArtwork.flatMap((item) =>
     item.attributes.files.map((file) => ({
@@ -268,7 +261,6 @@ async function getSong(id: string, countryCode: string): Promise<Song> {
     name: data.attributes.title,
     url: `https://tidal.com/browse/track/${id}`,
     durationSeconds,
-    durationFormatted: formatDuration(durationSeconds),
     isrc: data.attributes.isrc,
     artists,
     album: {
@@ -326,8 +318,8 @@ function mapEntityTypeToTidalType(type: MusicEntityType): TidalEntityType {
 
 function normalizeQuery(input: string) {
   return input
-    .normalize("NFKC")
-    .replace(/\p{C}+/gu, " ")
+    .normalize("NFC")
+    .replace(/[^\p{L}\p{N}\s]+/gu, "")
     .replace(/\s+/g, " ")
     .trim();
 }
