@@ -69,7 +69,7 @@ if (result.error) {
   Astro.response.status = getStatusCodeFromError(result.error);
 }
 
-if (result.fromEntity && result.toEntity) {
+if (!result.error) {
   Astro.response.headers.set("Cache-Control", "max-age=10800");
 }
 
@@ -97,7 +97,15 @@ const ogImageUrl = generateOgImageUrl(result.fromEntity);
       <a href="/" title="Home" class="logo">
         <Logo width="48" height="48" />
       </a>
-      <h1>{result.error ? "Error" : "Success!"}</h1>
+      <h1>
+        {
+          result.error
+            ? "Error"
+            : result.toEntity
+              ? "Success!"
+              : "No match found"
+        }
+      </h1>
       <p class="subtitle">
         {
           result.error ? (
@@ -139,15 +147,17 @@ const ogImageUrl = generateOgImageUrl(result.fromEntity);
       }
 
       {
-        !result.fromEntity && result.fromUrl && (
-          <p class="no-results">
-            The {result.fromUrl.type} you specified wasn't found on{" "}
-            {toSentenceCase(result.fromUrl.service)}.
-          </p>
-        )
+        result.fromEntity &&
+          !result.toEntity &&
+          !result.error &&
+          result.toService && (
+            <p class="no-results">
+              No match was found on {toSentenceCase(result.toService)}
+            </p>
+          )
       }
 
-      {result.toEntity && <div class="arrow">↑</div>}
+      {result.fromEntity && <div class="arrow">↑</div>}
 
       {
         result.fromEntity && result.fromUrl && (
@@ -159,10 +169,10 @@ const ogImageUrl = generateOgImageUrl(result.fromEntity);
       }
 
       {
-        result.fromEntity && !result.toEntity && !result.error && (
+        !result.fromEntity && result.fromUrl && (
           <p class="no-results">
-            No match was found on{" "}
-            {result.toService === "spotify" ? "Spotify" : "Tidal"}
+            The {result.fromUrl.type} you specified wasn't found on{" "}
+            {toSentenceCase(result.fromUrl.service)}.
           </p>
         )
       }
