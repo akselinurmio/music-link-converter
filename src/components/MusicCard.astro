@@ -2,6 +2,7 @@
 import SpotifyLogo from "../assets/spotify.svg";
 import TidalLogo from "../assets/tidal.svg";
 import type { MusicEntity } from "../music-types";
+import { formatArtistList } from "../utils/format";
 import { getImageByWidth } from "../utils/images";
 
 interface Props {
@@ -13,6 +14,25 @@ const { entity, service } = Astro.props;
 
 const minWidth = 140;
 const { image1x, image2x } = getImageByWidth(entity.images, minWidth);
+
+function formatReleaseDateTitle(releaseDate: string) {
+  const match = releaseDate.match(/^\d{4}-\d{2}(-\d{2})/);
+
+  if (!match) return null;
+
+  if (match[1]) {
+    return new Date(match[0]).toLocaleDateString("en", {
+      dateStyle: "full",
+      timeZone: "UTC",
+    });
+  }
+
+  return new Date(match[0]).toLocaleDateString("en", {
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
 ---
 
 <a
@@ -42,14 +62,16 @@ const { image1x, image2x } = getImageByWidth(entity.images, minWidth);
     {entity.type === "song" && <p class="meta-text">{entity.album.name}</p>}
     {
       entity.type !== "artist" && (
-        <p class="meta-text">
-          {entity.artists.map((artist) => artist.name).join(", ")}
-        </p>
+        <p class="meta-text">{formatArtistList(entity.artists)}</p>
       )
     }
     {
       entity.type === "album" && (
-        <time datetime={entity.releaseDate} class="meta-text">
+        <time
+          datetime={entity.releaseDate}
+          class="meta-text"
+          title={formatReleaseDateTitle(entity.releaseDate)}
+        >
           {entity.releaseDate.substring(0, 4)}
         </time>
       )
@@ -139,6 +161,12 @@ const { image1x, image2x } = getImageByWidth(entity.images, minWidth);
     color: var(--text-secondary);
     margin: 0;
     font-size: 0.9rem;
+  }
+
+  @media (hover: hover) {
+    .meta-text[title] {
+      text-decoration: underline dotted var(--text-muted);
+    }
   }
 
   .tags {

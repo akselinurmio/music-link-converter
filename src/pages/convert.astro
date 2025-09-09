@@ -7,7 +7,7 @@ import MusicCard from "../components/MusicCard.astro";
 import Layout from "../layouts/Layout.astro";
 import { convertMusicLink } from "../services/conversion";
 import { getStatusCodeFromError, ValidationError } from "../utils/errors";
-import { toSentenceCase } from "../utils/format";
+import { formatArtistList, toSentenceCase } from "../utils/format";
 import type { MusicEntity } from "../music-types";
 
 function generatePageTitle(
@@ -18,9 +18,7 @@ function generatePageTitle(
 
   const entityName = fromEntity.name;
   const artists =
-    fromEntity.type !== "artist"
-      ? fromEntity.artists.map((artist) => artist.name).join(", ")
-      : "";
+    fromEntity.type !== "artist" ? formatArtistList(fromEntity.artists) : "";
   const serviceName = toSentenceCase(toService || "");
 
   if (fromEntity.type === "artist") {
@@ -37,9 +35,7 @@ function generateMetaDescription(
   if (!fromEntity) return undefined;
 
   const artists =
-    fromEntity.type !== "artist"
-      ? fromEntity.artists.map((artist) => artist.name).join(", ")
-      : "";
+    fromEntity.type !== "artist" ? formatArtistList(fromEntity.artists) : "";
   const serviceName = toSentenceCase(toService || "");
 
   return `"${fromEntity.name}" by ${artists} is on ${serviceName}. Convert tracks, albums, and artists between Spotify and Tidal instantly with Music Link Converter.`;
@@ -123,13 +119,7 @@ const ogImageUrl = generateOgImageUrl(result.fromEntity);
               )}
               <i>{result.fromEntity.name}</i>
               {result.fromEntity.type !== "artist" && (
-                <>
-                  {" "}
-                  by{" "}
-                  {result.fromEntity.artists
-                    .map((artist) => artist.name)
-                    .join(", ")}
-                </>
+                <> by {formatArtistList(result.fromEntity.artists)}</>
               )}{" "}
               on {toSentenceCase(result.toService)}.
             </>
