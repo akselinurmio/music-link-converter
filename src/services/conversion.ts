@@ -103,12 +103,7 @@ export async function convertMusicLink(
         : await getSpotifyEntity(fromUrl.type, fromUrl.id, country);
 
     if (fromEntity) {
-      const query =
-        fromEntity.type === "album" || fromEntity.type === "song"
-          ? toService === "spotify"
-            ? `${fromEntity.artists.map((artist) => `artist:"${artist.name}"`).join(" ")} ${fromEntity.name}`
-            : `${fromEntity.artists.map((artist) => artist.name).join(" ")} ${fromEntity.name}`
-          : fromEntity.name;
+      const query = createQuery(fromEntity, toService);
 
       toEntity =
         fromUrl.service === "tidal"
@@ -127,4 +122,18 @@ export async function convertMusicLink(
     toEntity,
     error,
   };
+}
+
+function createQuery(entity: MusicEntity, service: "spotify" | "tidal") {
+  if (
+    service === "spotify" &&
+    entity.type !== "artist" &&
+    entity.artists.length === 1
+  ) {
+    return `${entity.artists.map((artist) => `artist:"${artist.name}"`).join(" ")} ${entity.name}`;
+  }
+
+  return entity.type === "artist"
+    ? entity.name
+    : `${entity.artists.map((artist) => artist.name).join(" ")} ${entity.name}`;
 }
