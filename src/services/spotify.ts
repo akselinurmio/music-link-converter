@@ -17,6 +17,15 @@ class SpotifyClient {
   private token: OAuth2Token | null = null;
 
   constructor() {
+    if (
+      !import.meta.env.SPOTIFY_CLIENT_ID ||
+      !import.meta.env.SPOTIFY_CLIENT_SECRET
+    ) {
+      throw new Error(
+        "SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET must be set",
+      );
+    }
+
     this.client = new OAuth2Client({
       server: "https://accounts.spotify.com",
       clientId: import.meta.env.SPOTIFY_CLIENT_ID,

@@ -16,6 +16,13 @@ class TidalClient {
   private token: OAuth2Token | null = null;
 
   constructor() {
+    if (
+      !import.meta.env.TIDAL_CLIENT_ID ||
+      !import.meta.env.TIDAL_CLIENT_SECRET
+    ) {
+      throw new Error("TIDAL_CLIENT_ID and TIDAL_CLIENT_SECRET must be set");
+    }
+
     this.client = new OAuth2Client({
       server: "https://auth.tidal.com/v1",
       clientId: import.meta.env.TIDAL_CLIENT_ID,
