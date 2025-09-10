@@ -85,7 +85,7 @@ const TidalArtworkSchema = z.object({
 });
 
 const TidalArtworkResponseSchema = z.object({
-  included: z.array(TidalArtworkSchema),
+  included: z.array(TidalArtworkSchema).optional(),
 });
 
 const TidalArtistSchema = z.object({
@@ -98,7 +98,7 @@ const TidalArtistSchema = z.object({
 
 const TidalArtistResponseSchema = z.object({
   data: TidalArtistSchema,
-  included: z.array(TidalArtworkSchema),
+  included: z.array(TidalArtworkSchema).optional(),
 });
 
 const TidalAlbumSchema = z.object({
@@ -126,7 +126,9 @@ const SimpleAlbumSchema = TidalAlbumSchema.omit({
 
 const TidalAlbumResponseSchema = z.object({
   data: TidalAlbumSchema,
-  included: z.array(z.union([TidalArtistSchema, TidalArtworkSchema])),
+  included: z
+    .array(z.union([TidalArtistSchema, TidalArtworkSchema]))
+    .optional(),
 });
 
 const TidalTrackSchema = z.object({
@@ -172,7 +174,7 @@ const TidalSearchResponseSchema = z.object({
 });
 
 async function getAlbum(id: string, countryCode: string): Promise<Album> {
-  const { data, included } = await tidalFetch(
+  const { data, included = [] } = await tidalFetch(
     `/albums/${encodeURIComponent(id)}?countryCode=${countryCode}&include=artists,coverArt`,
     TidalAlbumResponseSchema,
   );
@@ -202,7 +204,7 @@ async function getAlbum(id: string, countryCode: string): Promise<Album> {
 }
 
 async function getArtist(id: string, countryCode: string): Promise<Artist> {
-  const { data, included } = await tidalFetch(
+  const { data, included = [] } = await tidalFetch(
     `/artists/${encodeURIComponent(id)}?countryCode=${countryCode}&include=profileArt`,
     TidalArtistResponseSchema,
   );
@@ -235,7 +237,7 @@ async function getSong(id: string, countryCode: string): Promise<Song> {
 
   const albumId = data.relationships.albums.data[0].id;
 
-  const { included: albumArtwork } = await tidalFetch(
+  const { included: albumArtwork = [] } = await tidalFetch(
     `/albums/${encodeURIComponent(albumId)}/relationships/coverArt?countryCode=${countryCode}&include=coverArt`,
     TidalArtworkResponseSchema,
   );
